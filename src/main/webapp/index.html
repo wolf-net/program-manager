@@ -13,7 +13,7 @@
 				jQuery('#' + sectionId).addClass('content-current');
 			}
 			$(document).ready(function() {
-			    $('nav li:first i').trigger('onclick');
+			    $('nav li:eq(2) i').trigger('onclick');
 			});
 		</script>
 	</head>
@@ -70,7 +70,8 @@
 						  	<i class="fa fa-edit"></i>
 						  </div>
 						  <div class="card-content">
-						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+							<div class="name-display">Name</div>
+						    <div class="note-display">This is just your basic card with some text to boot. Like it?  Keep scrolling...</div>
 						  </div>
 						</div>
 						<div class="card">
@@ -78,12 +79,24 @@
 						  	<i class="fa fa-save"></i>
 						  </div>
 						  <div class="card-content">
-						    <input type="text" style="font-size: 1em;width: 100%;" placeholder="Name" />
+						    <input type="text" id="name-input" placeholder="Name" />
+						    <textarea id="note-input" placeholder="Notes"></textarea>
+								<input type="radio" name="gender" value="male"> Male<br>
+								<input type="radio" name="gender" value="female"> Female<br>
+								<input type="radio" name="gender" value="other"> Other
+						  </div>
+						  <div class="card-buttons">
+						  	<i class="fa fa-trash-o"></i>
 						  </div>
 						</div>
 						<div class="card">
+						  <div class="card-buttons">
+						  	<i class="fa fa-save"></i>
+						  </div>
 						  <div class="card-content">
-						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						    <input type="text" id="name-input" placeholder="Name" />
+						    <textarea id="note-input" placeholder="Notes"></textarea>
+							color
 						  </div>
 						</div>
 						<div class="card">
