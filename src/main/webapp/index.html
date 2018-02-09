@@ -1,0 +1,177 @@
+<html>
+	<head>
+		<link type="text/css" rel="stylesheet" href="css/component.css">
+		<link type="text/css" rel="stylesheet" href="css/font-awesome.css">
+		<link type="text/css" rel="stylesheet" href="css/demo.css">
+		<script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+		
+		<script>
+			function goToSection(elem, sectionId) {
+				jQuery('nav li').removeClass('tab-current');
+				jQuery('section').removeClass('content-current');
+				jQuery(elem).parent('li').addClass('tab-current');
+				jQuery('#' + sectionId).addClass('content-current');
+			}
+			$(document).ready(function() {
+			    $('nav li:first i').trigger('onclick');
+			});
+		</script>
+	</head>
+	<body>
+		<div id="tabs" class="tabs">
+			<nav>
+				<ul>
+					<li><i class="fa fa-calendar" onclick="goToSection(this, 'section-1')"><span>Programs</span></i></li>
+					<li><i class="fa fa-legal" onclick="goToSection(this, 'section-2')"><span>Rules</span></i></li>
+					<li><i class="fa fa-user" onclick="goToSection(this, 'section-3')"><span>Employees</span></i></li>
+					<li><i class="fa fa-home" onclick="goToSection(this, 'section-4')"><span>Stations</span></i></li>
+					<li><i class="fa fa-wrench" onclick="goToSection(this, 'section-5')"><span>Settings</span></i></li>
+				</ul>
+			</nav>
+			<div class="content">
+				<section id="section-1">
+					<div class="cards-list-container">
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+						<div class="card">
+						  <div class="card-content">
+						    This is just your basic card with some text to boot. Like it?  Keep scrolling...
+						  </div>
+						</div>
+					</div>
+				</section>
+				<section id="section-2">
+					<div class="mediabox">
+						<img src="img/04.png" alt="img04">
+						<h3>Asparagus Cucumber Cake</h3>
+						<p>Chickweed okra pea winter purslane coriander yarrow sweet pepper radish garlic brussels sprout groundnut summer purslane earthnut pea tomato spring onion azuki bean gourd. </p>
+					</div>
+					<div class="mediabox">
+						<img src="img/05.png" alt="img05">
+						<h3>Magis Kohlrabi Gourd</h3>
+						<p>Salsify taro catsear garlic gram celery bitterleaf wattle seed collard greens nori. Grape wattle seed kombu beetroot horseradish carrot squash brussels sprout chard.</p>
+					</div>
+					<div class="mediabox">
+						<img src="img/06.png" alt="img06">
+						<h3>Ricebean Rutabaga</h3>
+						<p>Celery quandong swiss chard chicory earthnut pea potato. Salsify taro catsear garlic gram celery bitterleaf wattle seed collard greens nori. </p>
+					</div>
+				</section>
+				<section id="section-3">
+					<div class="mediabox">
+						<img src="img/02.png" alt="img02">
+						<h3>Noodle Curry</h3>
+						<p>Lotus root water spinach fennel kombu maize bamboo shoot green bean swiss chard seakale pumpkin onion chickpea gram corn pea.Sushi gumbo beet greens corn soko endive gumbo gourd.</p>
+					</div>
+					<div class="mediabox">
+						<img src="img/06.png" alt="img06">
+						<h3>Leek Wasabi</h3>
+						<p>Sushi gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato.</p>
+					</div>
+					<div class="mediabox">
+						<img src="img/01.png" alt="img01">
+						<h3>Green Tofu Wrap</h3>
+						<p>Pea horseradish azuki bean lettuce avocado asparagus okra. Kohlrabi radish okra azuki bean corn fava bean mustard tigernut wasabi tofu broccoli mixture soup.</p>
+					</div>
+				</section>
+				<section id="section-4">
+					<div class="mediabox">
+						<img src="img/03.png" alt="img03">
+						<h3>Tomato Cucumber Curd</h3>
+						<p>Chickweed okra pea winter purslane coriander yarrow sweet pepper radish garlic brussels sprout groundnut summer purslane earthnut pea tomato spring onion azuki bean gourd. </p>
+					</div>
+					<div class="mediabox">
+						<img src="img/01.png" alt="img01">
+						<h3>Mushroom Green</h3>
+						<p>Salsify taro catsear garlic gram celery bitterleaf wattle seed collard greens nori. Grape wattle seed kombu beetroot horseradish carrot squash brussels sprout chard.</p>
+					</div>
+					<div class="mediabox">
+						<img src="img/04.png" alt="img04">
+						<h3>Swiss Celery Chard</h3>
+						<p>Celery quandong swiss chard chicory earthnut pea potato. Salsify taro catsear garlic gram celery bitterleaf wattle seed collard greens nori. </p>
+					</div>
+				</section>
+				<section id="section-5">
+					<div class="mediabox">
+						<img src="img/02.png" alt="img02">
+						<h3>Radish Tomato</h3>
+						<p>Catsear cauliflower garbanzo yarrow salsify chicory garlic bell pepper napa cabbage lettuce tomato kale arugula melon sierra leone bologi rutabaga tigernut.</p>
+					</div>
+					<div class="mediabox">
+						<img src="img/06.png" alt="img06">
+						<h3>Fennel Wasabi</h3>
+						<p>Sea lettuce gumbo grape kale kombu cauliflower salsify kohlrabi okra sea lettuce broccoli celery lotus root carrot winter purslane turnip greens garlic.</p>
+					</div>
+					<div class="mediabox">
+						<img src="img/01.png" alt="img01">
+						<h3>Red Tofu Wrap</h3>
+						<p>Green horseradish azuki bean lettuce avocado asparagus okra. Kohlrabi radish okra azuki bean corn fava bean mustard tigernut wasabi tofu broccoli mixture soup.</p>
+					</div>
+				</section>
+			</div>
+		</div>
+	</body>
+</html>
