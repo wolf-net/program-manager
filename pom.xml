@@ -71,6 +71,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>ROOT</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -79,11 +80,6 @@
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-<!--                 <configuration> -->
-<!--                     <failOnMissingWebXml>false</failOnMissingWebXml> -->
-<!--                     <outputDirectory>target</outputDirectory> -->
-<!--               		  <warName>ROOT</warName> -->
-<!--                 </configuration> -->
             </plugin>
 		</plugins>
 	</build>
