@@ -4,11 +4,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>ro.wolfnet</groupId>
-	<artifactId>hello-openshift</artifactId>
+	<artifactId>program-manager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
-	<name>hello-openshift</name>
+	<name>program-manager</name>
 	<description>Demo project for Spring Boot</description>
 
 	<parent>

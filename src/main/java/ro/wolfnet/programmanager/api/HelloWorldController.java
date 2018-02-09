@@ -1,4 +1,4 @@
-package ro.wolfnet.helloopenshift.api;
+package ro.wolfnet.programmanager.api;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import ro.wolfnet.helloopenshift.entity.UserEntity;
-import ro.wolfnet.helloopenshift.service.UserService;
+import ro.wolfnet.programmanager.entity.UserEntity;
+import ro.wolfnet.programmanager.service.UserService;
 
 /**
  * The Class HelloWorldController.

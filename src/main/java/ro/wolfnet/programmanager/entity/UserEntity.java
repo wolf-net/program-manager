@@ -1,4 +1,4 @@
-package ro.wolfnet.helloopenshift.entity;
+package ro.wolfnet.programmanager.entity;
 
 import java.io.Serializable;
 

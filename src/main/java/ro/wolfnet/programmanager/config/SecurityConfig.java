@@ -1,4 +1,4 @@
-package ro.wolfnet.helloopenshift.config;
+package ro.wolfnet.programmanager.config;
 
 import javax.sql.DataSource;
 

@@ -1,8 +1,8 @@
-package ro.wolfnet.helloopenshift.repository;
+package ro.wolfnet.programmanager.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import ro.wolfnet.helloopenshift.entity.UserEntity;
+import ro.wolfnet.programmanager.entity.UserEntity;
 
 /**
  * The Interface UserRepository.

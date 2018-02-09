@@ -1,4 +1,4 @@
-package ro.wolfnet.helloopenshift;
+package ro.wolfnet.programmanager;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

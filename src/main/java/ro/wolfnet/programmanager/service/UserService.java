@@ -1,4 +1,4 @@
-package ro.wolfnet.helloopenshift.service;
+package ro.wolfnet.programmanager.service;
 
 import java.util.List;
 
@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import ro.wolfnet.helloopenshift.entity.UserEntity;
-import ro.wolfnet.helloopenshift.repository.UserRepository;
+import ro.wolfnet.programmanager.entity.UserEntity;
+import ro.wolfnet.programmanager.repository.UserRepository;
 
 /**
  * The Class UserService.

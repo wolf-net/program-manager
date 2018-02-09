@@ -1,4 +1,4 @@
-package ro.wolfnet.helloopenshift;
+package ro.wolfnet.programmanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -20,7 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @ComponentScan
 @EnableAutoConfiguration
 @SpringBootApplication
-public class HelloOpenshiftApplication extends SpringBootServletInitializer {
+public class ProgramManagerApplication extends SpringBootServletInitializer {
 
   /**
    * The main method.
@@ -28,7 +28,7 @@ public class HelloOpenshiftApplication extends SpringBootServletInitializer {
    * @param args the arguments
    */
   public static void main(String[] args) {
-    SpringApplication.run(HelloOpenshiftApplication.class, args);
+    SpringApplication.run(ProgramManagerApplication.class, args);
   }
 
   /**
@@ -39,7 +39,7 @@ public class HelloOpenshiftApplication extends SpringBootServletInitializer {
    */
   @Override
   protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-    return application.sources(HelloOpenshiftApplication.class);
+    return application.sources(ProgramManagerApplication.class);
   }
 
   /**
