@@ -110,32 +110,82 @@ textarea {
 	border-radius: 10px;
 }
 
-input[type='radio']:after {
-	width: 100px;
-	height: 15px;
+form {
+	margin-bottom:0;
+}
+
+.colors-select {
+	text-align: center;
+}
+
+input[type='radio'] {
+	width: 20%;
+	height: 4em;
+	margin-top: 1.5em;
+}
+
+input[type='radio'].color:after {
+	width: 100%;
+	height: 4em;
 	border-radius: 15px;
 	top: -2px;
 	left: -1px;
-	position: relative;
-	background-color: #d1d3d1;
 	content: '';
 	display: inline-block;
 	visibility: visible;
 	border: 2px solid white;
 }
 
-input[type='radio']:checked:after {
-	width: 15px;
-	height: 15px;
-	border-radius: 15px;
-	top: -2px;
-	left: -1px;
-	position: relative;
-	background-color: #ffa500;
-	content: '';
-	display: inline-block;
-	visibility: visible;
-	border: 2px solid white;
+.card.black {
+	background-color: #e0e0d1;
+	color: #000000;
+}
+
+.card.blue {
+	background-color: #9999ff;
+	color: #0000cc;
+}
+
+.card.green {
+	background-color: #99ff99;
+	color: #145214;
+}
+
+.card.red {
+	background-color:  #ffb3b3;
+	color: #e60000;
+}
+
+input[type='radio'].color.black:after {
+	background-color: #e0e0d1;
+}
+
+input[type='radio'].color.blue:after {
+	background-color: #9999ff;
+}
+
+input[type='radio'].color.green:after {
+	background-color: #99ff99;
+}
+
+input[type='radio'].color.red:after {
+	background-color: #ffb3b3;
+}
+
+input[type='radio'].color.black:checked:after {
+	background-color: #000000;
+}
+
+input[type='radio'].color.blue:checked:after {
+	background-color: #3333ff;
+}
+
+input[type='radio'].color.green:checked:after {
+	background-color: #33ff33;
+}
+
+input[type='radio'].color.red:checked:after {
+	background-color: #ff1a1a;
 }
 
 .card .fa-trash-o {
