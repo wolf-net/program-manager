@@ -17,6 +17,7 @@ public class EmployeeEntity implements Serializable {
   private String name;
   private String note;
   private int type;
+  private int status;
 
   public Long getId() {
     return id;
@@ -48,6 +49,14 @@ public class EmployeeEntity implements Serializable {
 
   public void setType(int type) {
     this.type = type;
+  }
+
+  public int getStatus() {
+    return status;
+  }
+
+  public void setStatus(int status) {
+    this.status = status;
   }
 
 }

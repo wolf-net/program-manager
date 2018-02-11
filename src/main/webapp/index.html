@@ -4,18 +4,7 @@
 		<link type="text/css" rel="stylesheet" href="css/font-awesome.css">
 		<link type="text/css" rel="stylesheet" href="css/demo.css">
 		<script type="text/javascript" src="js/jquery-3.3.1.js"></script>
-		
-		<script>
-			function goToSection(elem, sectionId) {
-				jQuery('nav li').removeClass('tab-current');
-				jQuery('section').removeClass('content-current');
-				jQuery(elem).parent('li').addClass('tab-current');
-				jQuery('#' + sectionId).addClass('content-current');
-			}
-			$(document).ready(function() {
-			    $('nav li:eq(2) i').trigger('onclick');
-			});
-		</script>
+		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body>
 		<div id="tabs" class="tabs">
@@ -65,79 +54,6 @@
 				</section>
 				<section id="section-3">
 					<div class="cards-list-container">
-						<div class="card black">
-						  <div class="card-buttons">
-						  	<i class="fa fa-edit"></i>
-						  </div>
-						  <div class="card-content">
-							<div class="name-display">NNName</div>
-						    <div class="note-display">This is just your basic card with some text to boot. Like it?  Keep scrolling...</div>
-						  </div>
-						</div>
-						<div class="card blue">
-						  <div class="card-buttons">
-						  	<i class="fa fa-edit"></i>
-						  </div>
-						  <div class="card-content">
-							<div class="name-display">Name</div>
-						    <div class="note-display">This is just your basic card with some text to boot. Like it?  Keep scrolling...</div>
-						  </div>
-						</div>
-						<div class="card green">
-						  <div class="card-buttons">
-						  	<i class="fa fa-edit"></i>
-						  </div>
-						  <div class="card-content">
-							<div class="name-display">Name</div>
-						    <div class="note-display">This is just your basic card with some text to boot. Like it?  Keep scrolling...</div>
-						  </div>
-						</div>
-						<div class="card red">
-						  <div class="card-buttons">
-						  	<i class="fa fa-edit"></i>
-						  </div>
-						  <div class="card-content">
-							<div class="name-display">Name</div>
-						    <div class="note-display">This is just your basic card with some text to boot. Like it?  Keep scrolling...</div>
-						  </div>
-						</div>
-						<div class="card">
-						  <div class="card-buttons">
-						  	<i class="fa fa-save"></i>
-						  </div>
-						  <div class="card-content
-							<form id="edit">
-								<input type="text" id="name-input" placeholder="Name" />
-								<textarea id="note-input" placeholder="Notes"></textarea>
-								<div class="colors-select">
-									<input type="radio" name="type-input" class="color black" value="black">
-									<input type="radio" name="type-input" class="color blue" value="blue">
-									<input type="radio" name="type-input" class="color green" value="green">
-									<input type="radio" name="type-input" class="color red" value="red">
-								</div>
-							</form>
-						  </div>
-						  <div class="card-buttons">
-						  	<i class="fa fa-trash-o"></i>
-						  </div>
-						</div>
-						<div class="card">
-						  <div class="card-buttons">
-						  	<i class="fa fa-save"></i>
-						  </div>
-						  <div class="card-content">
-							<form id="new">
-								<input type="text" id="name-input" placeholder="Name" />
-								<textarea id="note-input" placeholder="Notes"></textarea>
-								<div class="colors-select">
-									<input type="radio" name="type-input" class="color black" value="black" checked="checked">
-									<input type="radio" name="type-input" class="color blue" value="blue">
-									<input type="radio" name="type-input" class="color green" value="green">
-									<input type="radio" name="type-input" class="color red" value="red">
-								</div>
-							</form>
-						  </div>
-						</div>
 					</div>
 				</section>
 				<section id="section-4">
