@@ -1,7 +1,8 @@
 $(document).ready(function() {
-	$('nav li:eq(3) i').trigger('onclick');
+	$('nav li:eq(0) i').trigger('onclick');
 	loadEmployees();
 	loadStations();
+	loadPrograms();
 });
 
 function goToSection(elem, sectionId) {
@@ -212,6 +213,10 @@ function deleteStation(stationId) {
 	}).always(function() {
 		loadStations();
 	});
+}
+
+function loadPrograms() {
+	$('#calendar-programs').dcalendar();
 }
 
 function getString(text) {

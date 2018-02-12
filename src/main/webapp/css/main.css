@@ -224,7 +224,7 @@ input, textarea {
 }
 
 /* Content */
-.content section {
+.content section.tab-section {
 	font-size: 1.25em;
 	padding: 3em 1em;
 	display: none;
@@ -232,24 +232,24 @@ input, textarea {
 	margin: 0 auto;
 }
 
-.content section:before,
-.content section:after {
+.content section.tab-section:before,
+.content section.tab-section:after {
 	content: '';
 	display: table;
 }
 
-.content section:after {
+.content section.tab-section:after {
 	clear: both;
 }
 
 /* Fallback example */
-.no-js .content section {
+.no-js .content section.tab-section {
 	display: block;
 	padding-bottom: 2em;
 	border-bottom: 1px solid #47a3da;
 }
 
-.content section.content-current {
+.content section.tab-section.content-current {
 	display: block;
 }
 
@@ -590,4 +590,52 @@ p.info {
 .page-buttons div.button:active {
 	font-size: 1.9em;
 	width: 98%;
+}
+
+#calendar-programs .calendar-head-card {
+	display:none;	
+}
+
+#calendar-programs {
+	width: 100%;
+}
+
+#calendar-programs .calendar-container {
+	padding: 0;
+}
+
+#calendar-programs a,
+#calendar-programs .calendar-top-selector span,
+#calendar-programs .calendar-labels span {
+	font-size: 3em;
+}
+
+#calendar-programs .calendar-labels:after,
+#calendar-programs .calendar-date-holder .calendar-dates .cal-row:after {
+	content: '';
+    width: 100000000px;
+    right: 0;
+    border-bottom: 10px solid #f4f4f7;
+    position: absolute;
+}
+
+#calendar-programs .calendar-date-holder .calendar-dates .cal-row .date,
+#calendar-programs .calendar-grid .calendar-labels span {
+	padding-top: 20px;
+}
+
+#calendar-programs .calendar-dates .date.current a,
+#calendar-programs .calendar-dates .date.selected a {
+	border-width: 0px;
+	color: inherit;
+	font-weight: inherit;
+}
+
+#calendar-programs .calendar-wrapper {
+	width: 100%;
+}
+
+#calendar-programs .calendar-wrapper .calendar-date-holder {
+	width: 100%;
+	height: 32em;
 }

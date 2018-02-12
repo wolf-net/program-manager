@@ -1,8 +1,10 @@
 <html>
 	<head>
+		<link type="text/css" rel="stylesheet" href="css/dcalendar.picker.css">
 		<link type="text/css" rel="stylesheet" href="css/font-awesome.css">
 		<link type="text/css" rel="stylesheet" href="css/main.css">
 		<script type="text/javascript" src="js/jquery-3.3.1.js"></script>
+		<script type="text/javascript" src="js/dcalendar.picker.js"></script>
 		<script type="text/javascript" src="js/main.js"></script>
 	</head>
 	<body>
@@ -17,24 +19,10 @@
 				</ul>
 			</nav>
 			<div class="content">
-				<section id="section-1">
-					<div class="mediabox">
-						<img src="img/02.png" alt="img02">
-						<h3>Noodle Curry</h3>
-						<p>Lotus root water spinach fennel kombu maize bamboo shoot green bean swiss chard seakale pumpkin onion chickpea gram corn pea.Sushi gumbo beet greens corn soko endive gumbo gourd.</p>
-					</div>
-					<div class="mediabox">
-						<img src="img/06.png" alt="img06">
-						<h3>Leek Wasabi</h3>
-						<p>Sushi gumbo beet greens corn soko endive gumbo gourd. Parsley shallot courgette tatsoi pea sprouts fava bean collard greens dandelion okra wakame tomato.</p>
-					</div>
-					<div class="mediabox">
-						<img src="img/01.png" alt="img01">
-						<h3>Green Tofu Wrap</h3>
-						<p>Pea horseradish azuki bean lettuce avocado asparagus okra. Kohlrabi radish okra azuki bean corn fava bean mustard tigernut wasabi tofu broccoli mixture soup.</p>
-					</div>
+				<section id="section-1" class="tab-section">
+					<table id="calendar-programs" class="calendar"></table>
 				</section>
-				<section id="section-2">
+				<section id="section-2" class="tab-section">
 					<div class="mediabox">
 						<img src="img/04.png" alt="img04">
 						<h3>Asparagus Cucumber Cake</h3>
@@ -51,15 +39,15 @@
 						<p>Celery quandong swiss chard chicory earthnut pea potato. Salsify taro catsear garlic gram celery bitterleaf wattle seed collard greens nori. </p>
 					</div>
 				</section>
-				<section id="section-3">
+				<section id="section-3" class="tab-section">
 					<div class="cards-list-container">
 					</div>
 				</section>
-				<section id="section-4">
+				<section id="section-4" class="tab-section">
 					<div class="cards-list-container">
 					</div>
 				</section>
-				<section id="section-5">
+				<section id="section-5" class="tab-section">
 					Change password: <input id="new-password" type="password" />
 					<div class="page-buttons">
 						<div class="button" onClick="saveSettings()">Save</div>
