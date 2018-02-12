@@ -44,9 +44,30 @@ public class UserService {
     user.setPassword(bCryptPasswordEncoder.encode("u_" + System.currentTimeMillis()));
     this.userRepository.save(user);
   }
-  
+
+  /**
+   * The main method.
+   *
+   * @param args the arguments
+   */
   public static void main(String[] args) {
     System.out.println(new BCryptPasswordEncoder().encode("isti"));
   }
-  
+
+  /**
+   * Change password.
+   *
+   * @param name the name
+   * @param newPassword the new password
+   */
+  public void changePassword(String userName, String newPassword) {
+    for (UserEntity user:userRepository.findAll()) {
+      if (user.getUsername().equals(userName)) {
+        user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        userRepository.save(user);
+        break;
+      }
+    }
+  }
+
 }

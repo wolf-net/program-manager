@@ -53,7 +53,7 @@ function editEmployee(editButton) {
 		'	<form id="edit">' +
 		'		<input type="hidden" id="id-input" value="' + jContent.find('#id-input').val() + '" />' +
 		'		<input type="text" id="name-input" placeholder="Name" value="' + jContent.find('.name-display').html() + '" />' +
-		'		<textarea id="note-input" placeholder="Notes">' + jContent.find('.note-display').html() + '</textarea>' +
+		'		<textarea id="note-input" placeholder="Notes">' + jContent.find('.note-display').html().replace('<br>', '\n') + '</textarea>' +
 		'		<div class="colors-select">' +
 		'			<input type="radio" name="type-input" class="color black" value="black" ' + blackChecked + '>' +
 		'			<input type="radio" name="type-input" class="color blue" value="blue" ' + blueChecked + '>' +
@@ -85,7 +85,7 @@ function loadEmployees() {
 				'	 <input type="hidden" id="id-input" value="' + element.id + '" /> ' +
 				'	 <input type="hidden" id="type-input" value="' + element.type + '" /> ' +
 				'	 <div class="name-display">' + element.name + '</div>' +
-				'    <div class="note-display">' + element.note + '</div>' +
+				'    <div class="note-display">' + element.note.replace('\n', '<br/>') + '</div>' +
 				'  </div>' +
 				'</div>';
 			$('#section-3 .cards-list-container').append(cardContent);
@@ -109,5 +109,20 @@ function loadEmployees() {
 			' </div>' +
 			'</div>';
 		$('#section-3 .cards-list-container').append(cardContent);
+	});
+}
+
+function saveSettings() {
+	var markers = {
+		newPassword: $('#section-5 #new-password').val()
+	};
+	$.ajax({
+		url: "settings",
+		method: "POST",
+		dataType: "jsonp",
+        contentType: "application/json",
+		data: JSON.stringify(markers)
+	}).always(function() {
+		$('#section5 #new-password').val('');
 	});
 }
