@@ -203,18 +203,11 @@ input[type='radio'].color.red:checked:after {
     font-size: 70%;
 }
 
-input {
-	font-size: 1em;
-}
-
-.card-content #name-input {
-	width: 100%;
-}
-
-.card-content #note-input {
-	margin-top: 0.5em;
+input, textarea {
+	margin: 0.25em 0;
 	font-size: 1em;
 	width: 100%;
+	font-size: 1em;
 }
 
 /* Icons */
