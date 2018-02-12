@@ -123,6 +123,6 @@ function saveSettings() {
         contentType: "application/json",
 		data: JSON.stringify(markers)
 	}).always(function() {
-		$('#section5 #new-password').val('');
+		location.reload();
 	});
 }
