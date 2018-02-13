@@ -602,6 +602,7 @@ p.info {
 
 #calendar-programs .calendar-container {
 	padding: 0;
+	background-color: initial;
 }
 
 #calendar-programs a,
@@ -610,18 +611,20 @@ p.info {
 	font-size: 3em;
 }
 
-#calendar-programs .calendar-labels:after,
-#calendar-programs .calendar-date-holder .calendar-dates .cal-row:after {
-	content: '';
-    width: 100000000px;
-    right: 0;
-    border-bottom: 10px solid #f4f4f7;
-    position: absolute;
+#calendar-programs .calendar-container {
+	border-spacing: 10px;
 }
 
-#calendar-programs .calendar-date-holder .calendar-dates .cal-row .date,
-#calendar-programs .calendar-grid .calendar-labels span {
-	padding-top: 20px;
+#calendar-programs .calendar-top-selector span,
+#calendar-programs .calendar-grid .calendar-labels span,
+#calendar-programs .calendar-date-holder .calendar-dates .cal-row span {
+	background-color: #FFF;
+	padding: 10px 0;
+}
+
+#calendar-programs .calendar-top-selector span,
+#calendar-programs .calendar-labels span {
+	padding: 22px !important;
 }
 
 #calendar-programs .calendar-dates .date.current a,
@@ -637,5 +640,5 @@ p.info {
 
 #calendar-programs .calendar-wrapper .calendar-date-holder {
 	width: 100%;
-	height: 32em;
+	height: 35em;
 }
