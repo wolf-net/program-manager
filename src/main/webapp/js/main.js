@@ -229,6 +229,19 @@ function loadProgramsForDay(date) {
 	$('#day-programs .calendar-curr-month').html(date);
 }
 
+var months = ['Ianuarie','Februarie','Martie','Aprile','Mai','Iunie','Iulie','August','Septemberbie','Octoberbrie','Noiembrie','Decembrie'];
+function navigateDayPrograms(direction) {
+	var currentDate = new Date(Date.parse($('#day-programs .calendar-curr-month').html()));
+	console.log(currentDate);
+	currentDate.setDate(currentDate.getDate() + direction);
+	console.log(currentDate);
+	var dateTxt = currentDate.toISOString().substring(0, 10);
+	var year = dateTxt.split('-')[0];
+	var day = dateTxt.split('-')[2];
+	var month = months[parseInt(dateTxt.split('-')[1]) - 1];
+	loadProgramsForDay(day + ' ' + month + ' ' + year);
+}
+
 function getString(text) {
 	return getString(text, '');
 }

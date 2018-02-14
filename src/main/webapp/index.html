@@ -22,14 +22,43 @@
 				<section id="section-1" class="tab-section">
 					<div id="day-programs">
 						<section class="calendar-top-selector">
-							<span class="calendar-prev">&lsaquo;</span>
+							<span class="calendar-prev" onclick="navigateDayPrograms(-1);">&lsaquo;</span>
 							<span class="calendar-curr-month" onclick="loadPrograms();">01 Februarie 2018</span>
-							<span class="calendar-next">&rsaquo;</span>
+							<span class="calendar-next" onclick="navigateDayPrograms(+1);">&rsaquo;</span>
 						</section>
 						<div class="day-program">
-					        First station<br>
-					        - First employee<br>
-					        - Second employee
+					        <div class="station">First station</div>
+							<ol class="employees">
+								<li>First employee</li>
+								<li>Second employee</li>
+								<li class="green">Third employee</li>
+								<li>Fourth employee</li>
+								<li class="red">Fifth employee</li>
+							</ol>
+					    </div>
+						<div class="day-program">
+					        <div class="station">Second station</div>
+							<ol class="employees">
+								<li>First employee</li>
+								<li class="blue">Second employee</li>
+								<li>Third employee</li>
+								<li>Fourth employee</li>
+								<li>Fifth employee</li>
+								<li>Sixth employee</li>
+								<li class="green">Seventh employee</li>
+							</ol>
+					    </div>
+						<div class="day-program">
+					        <div class="station">Third station</div>
+							<ol class="employees">
+								<li>First employee</li>
+								<li>Second employee</li>
+								<li>Third employee</li>
+								<li>Fourth employee</li>
+								<li class="red">Fifth employee</li>
+								<li>Sixth employee</li>
+								<li>Seventh employee</li>
+							</ol>
 					    </div>
 					</div>
 					<table id="calendar-programs" class="calendar"></table>

@@ -11,10 +11,15 @@ body {
 /* Nav */
 .tabs nav {
 	position: fixed;
-	text-align: center;
-	width: 100%;
-    background-color: #fff;
+    text-align: center;
+    width: 100%;
     z-index: 999999;
+    padding-bottom: 1em;
+    background-color: #f4f4f7;
+}
+
+.tabs nav li {
+	background-color: #FFF;
 }
 
 .tabs nav ul {
@@ -141,22 +146,34 @@ input[type='radio'].color:after {
 
 .card.black {
 	background-color: #e0e0d1;
-	color: #000000;
 }
 
 .card.blue {
 	background-color: #9999ff;
-	color: #0000cc;
 }
 
 .card.green {
 	background-color: #99ff99;
-	color: #145214;
 }
 
 .card.red {
 	background-color:  #ffb3b3;
+}
+
+.red {
 	color: #e60000;
+}
+
+.green {
+	color: #145214;
+}
+
+.blue {
+	color: #0000cc;
+}
+
+.black {
+	color: #000000;
 }
 
 input[type='radio'].color.black:after {
@@ -566,19 +583,20 @@ p.info {
 }
 
 .page-buttons {
-	padding: 0 1em 0;
+	padding: 0.5em 1em 1em 1em;
     width: 100%;
-    bottom: 1em;
+    bottom: 0;
     left: 0;
     position: fixed;
-    text-align:center;
+    text-align: center;
+    background-color: #f4f4f7;
 }
 
 .page-buttons div.button {
 	text-align: center;
     font-size: 1.3em;
-    background-color: #FFF;
-    color: #47a3da;
+    background-color: #47a3da;
+    color: #FFF;
     border-radius: 20px;
     display: inline-block;
     padding: 20px 0 15px;
@@ -586,13 +604,22 @@ p.info {
     width: 98%;
 }
 
+.page-buttons div.button .fa {
+	color: #FFF;
+}
+
 .page-buttons.two-buttons div.button {
     width: 45%;
 }
 
 .page-buttons div.button:active {
-	font-size: 1.9em;
-	width: 98%;
+	font-size: 1.2em;
+	width: 96%;
+}
+
+.page-buttons.two-buttons div.button:active {
+	font-size: 1.2em;
+	width: 43%;
 }
 
 #calendar-programs .calendar-head-card {
@@ -649,8 +676,17 @@ p.info {
 
 #section-1 #day-programs .day-program {
 	background-color: #FFF;
-    margin: 5px;
-    padding: 20px;
+    margin: 40px 10px;
+    padding: 20px 55px;
+}
+
+#section-1 #day-programs .day-program .station {
+	font-weight: bold;
+}
+
+#section-1 #day-programs .day-program .employees {
+	font-size: 0.5em;
+	margin: 30px 0 30px 80px;
 }
 
 #calendar-programs .calendar-dates .date.current a,
