@@ -14,10 +14,10 @@ if (typeof jQuery === 'undefined') { throw new Error('DCalendar.Picker: This plu
 
 	Date.prototype.getDays = function() { return new Date(this.getFullYear(), this.getMonth() + 1, 0).getDate(); };
 
-	var months = ['January','February','March','April','May','June','July','August','September','October','November','December'],
-		short_months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-		daysofweek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'],
-		short_days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],
+	var months = ['Ianuarie','Februarie','Martie','Aprile','Mai','Iunie','Iulie','August','Septemberbie','Octoberbrie','Noiembrie','Decembrie'],
+		short_months = ['Ian','Feb','Mar','Apr','Mai','Iun','Iul','Aug','Sep','Oct','Noi','Dec'],
+		daysofweek = ['Duminica','Luni','Marti','Miercuri','Joi','Vineri','Sambata'],
+		short_days = ['Dum','Lun','Mar','Mie','Joi','Vin','Sam'],
 		ex_keys = [9,112,113,114,115,116,117,118,119,120,121,122,123],
 		DCAL_DATA = 'dcalendar',
 
@@ -400,7 +400,7 @@ if (typeof jQuery === 'undefined') { throw new Error('DCalendar.Picker: This plu
 				container = $('<div class="calendar-container"></div>'),
 				calhead = $('<section class="calendar-top-selector"><span class="calendar-prev">&lsaquo;</span><span class="calendar-curr-month"></span><span class="calendar-next">&rsaquo;</span></section>'),
 				datesgrid = $('<section class="calendar-grid">'
-							+ '<div class="calendar-labels"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>'
+							+ '<div class="calendar-labels"><span>Du</span><span>Lu</span><span>Ma</span><span>Mi</span><span>Jo</span><span>Vi</span><span>Sa</span></div>'
 							+ '<div class="calendar-date-holder"><section class="calendar-dates"></section></div></section>');
 
 			calhead.appendTo(container);

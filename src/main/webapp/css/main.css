@@ -14,6 +14,7 @@ body {
 	text-align: center;
 	width: 100%;
     background-color: #fff;
+    z-index: 999999;
 }
 
 .tabs nav ul {
@@ -615,6 +616,7 @@ p.info {
 	border-spacing: 10px;
 }
 
+#section-1 #day-programs .calendar-top-selector span,
 #calendar-programs .calendar-top-selector span,
 #calendar-programs .calendar-grid .calendar-labels span,
 #calendar-programs .calendar-date-holder .calendar-dates .cal-row span {
@@ -625,6 +627,29 @@ p.info {
 #calendar-programs .calendar-top-selector span,
 #calendar-programs .calendar-labels span {
 	padding: 22px !important;
+}
+
+#section-1 #day-programs {
+	padding: 0 10px;
+}
+
+#section-1 #day-programs .calendar-top-selector span {
+	font-family: Roboto;
+	font-weight: bold;
+	font-size: 2.1em;
+	padding: 25px 0 !important;
+    border: 5px solid #f4f4f7;
+}
+
+#section-1 #day-programs .calendar-top-selector .calendar-prev,
+#section-1 #day-programs .calendar-top-selector .calendar-next {
+	font-family: 'Times New Roman';
+}
+
+#section-1 #day-programs .day-program {
+	background-color: #FFF;
+    margin: 5px;
+    padding: 20px;
 }
 
 #calendar-programs .calendar-dates .date.current a,
@@ -642,3 +667,5 @@ p.info {
 	width: 100%;
 	height: 35em;
 }
+
+

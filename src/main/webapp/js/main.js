@@ -216,7 +216,17 @@ function deleteStation(stationId) {
 }
 
 function loadPrograms() {
-	$('#calendar-programs').dcalendar();
+	$('#day-programs').hide();
+	$('#calendar-programs').show();
+	$('#calendar-programs').dcalendar({format: 'dd MMMM yyyy'}).on('dateselected', function (e) {
+		loadProgramsForDay(e.date);				
+	});
+}
+
+function loadProgramsForDay(date) {
+	$('#calendar-programs').hide();
+	$('#day-programs').show();
+	$('#day-programs .calendar-curr-month').html(date);
 }
 
 function getString(text) {
