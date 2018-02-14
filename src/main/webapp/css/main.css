@@ -208,7 +208,6 @@ input, textarea {
 	margin: 0.25em 0;
 	font-size: 1em;
 	width: 100%;
-	font-size: 1em;
 }
 
 /* Icons */
@@ -226,7 +225,7 @@ input, textarea {
 
 /* Content */
 .content section.tab-section {
-	font-size: 1.25em;
+	font-size: 2.5em;
 	padding: 3em 1em;
 	display: none;
 	max-width: 1230px;
@@ -562,10 +561,6 @@ p.info {
 	}
 }
 
-#section-5 {
-	font-size: 3em;
-}
-
 #section-5 #new-password {
 	width: 100%;
 }
@@ -581,11 +576,18 @@ p.info {
 
 .page-buttons div.button {
 	text-align: center;
-    font-size: 2em;
-    background-color: #47a3da;
-    border-radius: 6px;
+    font-size: 1.3em;
+    background-color: #FFF;
+    color: #47a3da;
+    border-radius: 20px;
     display: inline-block;
-    width: 100%;
+    padding: 20px 0 15px;
+    margin: 0 10px;
+    width: 98%;
+}
+
+.page-buttons.two-buttons div.button {
+    width: 45%;
 }
 
 .page-buttons div.button:active {
@@ -629,16 +631,15 @@ p.info {
 	padding: 22px !important;
 }
 
-#section-1 #day-programs {
-	padding: 0 10px;
+#section-1 #day-programs .calendar-top-selector {
+	border-spacing: 10px;
 }
 
 #section-1 #day-programs .calendar-top-selector span {
 	font-family: Roboto;
 	font-weight: bold;
-	font-size: 2.1em;
-	padding: 25px 0 !important;
-    border: 5px solid #f4f4f7;
+	padding: 22px 0 !important;
+	display: table-cell;
 }
 
 #section-1 #day-programs .calendar-top-selector .calendar-prev,

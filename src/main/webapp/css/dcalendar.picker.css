@@ -92,7 +92,6 @@
 	.calendar-top-selector .calendar-curr-month { padding-bottom: 4px; }
 .calendar-next, .calendar-prev {
 	font-family: 'Times New Roman';
-	font-size: 24px;
 	width: 14%;
 	color: rgb(50,50,50);
 }
