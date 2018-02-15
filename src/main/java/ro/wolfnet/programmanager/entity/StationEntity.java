@@ -1,40 +1,45 @@
 package ro.wolfnet.programmanager.entity;
 
-import java.io.Serializable;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * The Class StationEntity.
  *
  * @author isti
- * @since Feb 12, 2018
+ * @since Feb 15, 2018
  */
 @Entity
-public class StationEntity implements Serializable {
-
-  /** The Constant serialVersionUID. */
-  private static final long serialVersionUID = -4637018459358319222L;
-
+@Table(name = "station_entity")
+public class StationEntity {
+  
   /** The id. */
-  @Id
-  @GeneratedValue
-  private Long id;
+  private long id;
   
   /** The name. */
   private String name;
   
   /** The capacity. */
   private int capacity;
+  
+  /** The programs. */
+  private Set<ProgramEntity> programs;
 
   /**
    * Gets the id.
    *
    * @return the id
    */
-  public Long getId() {
+  @Id
+  @GeneratedValue(strategy = GenerationType.AUTO)
+  public long getId() {
     return id;
   }
 
@@ -43,7 +48,7 @@ public class StationEntity implements Serializable {
    *
    * @param id the new id
    */
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
 
@@ -83,4 +88,22 @@ public class StationEntity implements Serializable {
     this.capacity = capacity;
   }
 
+  /**
+   * Gets the programs.
+   *
+   * @return the programs
+   */
+  @OneToMany(mappedBy = "station", cascade = CascadeType.ALL)
+  public Set<ProgramEntity> getPrograms() {
+    return programs;
+  }
+
+  /**
+   * Sets the programs.
+   *
+   * @param programs the new programs
+   */
+  public void setPrograms(Set<ProgramEntity> programs) {
+    this.programs = programs;
+  }
 }

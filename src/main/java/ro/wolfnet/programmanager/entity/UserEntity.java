@@ -1,7 +1,5 @@
 package ro.wolfnet.programmanager.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -13,10 +11,7 @@ import javax.persistence.Id;
  * @since Feb 5, 2018
  */
 @Entity
-public class UserEntity implements Serializable {
-
-  /** The Constant serialVersionUID. */
-  private static final long serialVersionUID = 5476745898491044394L;
+public class UserEntity {
 
   /** The id. */
   @Id
