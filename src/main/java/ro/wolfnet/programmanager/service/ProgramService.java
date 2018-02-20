@@ -50,7 +50,7 @@ public class ProgramService {
    * @return the list
    */
   public List<ProgramModel> findAllForOneDay(Date dayOfProgram) {
-    List<ProgramEntity> entities = programRepository.findAll(dayOfProgram);
+    List<ProgramEntity> entities = programRepository.findAllByDate(dayOfProgram);
     List<ProgramModel> models = new ArrayList<>();
     for (ProgramEntity entity : entities) {
       int stationIdx = models.indexOf(new ProgramModel(entity.getStation().getName()));
@@ -94,6 +94,7 @@ public class ProgramService {
       for (StationModel station : allStations) {
         programsForDay.addAll(getProgramsForStation(station, dayOfProgram, allEmployees));
       }
+      programRepository.deleteByDate(dayOfProgram);
       programRepository.save(programsForDay);
     } catch (Exception e) {
       System.out.println("Error generating programs for day: " + dayOfProgram + "! " + e.getMessage());

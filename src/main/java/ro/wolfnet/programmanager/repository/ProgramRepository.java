@@ -4,8 +4,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import ro.wolfnet.programmanager.entity.ProgramEntity;
 
@@ -24,5 +26,15 @@ public interface ProgramRepository extends JpaRepository<ProgramEntity, Long> {
    * @return the list
    */
   @Query("SELECT p FROM ProgramEntity p where p.date = :date")
-  List<ProgramEntity> findAll(@Param("date") Date date);
+  List<ProgramEntity> findAllByDate(@Param("date") Date date);
+
+  /**
+   * Delete by date.
+   *
+   * @param date the date
+   */
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM ProgramEntity p where p.date = :date")
+  void deleteByDate(@Param("date") Date date);
 }
