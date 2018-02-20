@@ -269,7 +269,7 @@ function generatePrograms() {
 		console.log('generate for calendar');
 	}
 	if ($('#day-programs').is(":visible")) {
-		var date = $('#day-programs .calendar-curr-month').html();
+		var date = $('#day-programs #calendar-curr-date').val();
 		$.ajax({
 			url: "programDay?dayOfProgram=" + date,
 			method: "PUT"
