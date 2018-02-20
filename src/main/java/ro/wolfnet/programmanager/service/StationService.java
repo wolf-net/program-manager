@@ -74,7 +74,7 @@ public class StationService {
    * @param model the model
    * @return the entity from model
    */
-  private StationEntity getEntityFromModel(StationModel model) {
+  public StationEntity getEntityFromModel(StationModel model) {
     if (model == null) {
       return null;
     }

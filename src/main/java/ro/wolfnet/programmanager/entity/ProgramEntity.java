@@ -1,5 +1,7 @@
 package ro.wolfnet.programmanager.entity;
 
+import java.util.Date;
+
 import javax.persistence.*;
 
 /**
@@ -15,7 +17,7 @@ public class ProgramEntity {
   private int id;
 
   /** The name. */
-  private String name;
+  private Date date;
 
   /** The station. */
   private StationEntity station;
@@ -44,21 +46,21 @@ public class ProgramEntity {
   }
 
   /**
-   * Gets the name.
+   * Gets the date.
    *
-   * @return the name
+   * @return the date
    */
-  public String getName() {
-    return name;
+  public Date getDate() {
+    return date;
   }
 
   /**
-   * Sets the name.
+   * Sets the date.
    *
-   * @param name the new name
+   * @param date the new date
    */
-  public void setName(String name) {
-    this.name = name;
+  public void setDate(Date date) {
+    this.date = date;
   }
 
   /**

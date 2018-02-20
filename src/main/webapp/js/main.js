@@ -224,9 +224,33 @@ function loadPrograms() {
 }
 
 function loadProgramsForDay(date) {
+	$('#day-programs .day-program').remove();
 	$('#calendar-programs').hide();
 	$('#day-programs').show();
 	$('#day-programs .calendar-curr-month').html(date);
+
+	var currentDate = new Date(Date.parse(date));
+	var dateString = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+	$.ajax({
+		url: "programDay?dayOfProgram=" + dateString,
+		method: "GET"
+	}).done(function(response) {
+		$(response).each(function(index, element) {
+			var employeesList = '';
+			$(element.employees).each(function(index, element) {
+				employeesList += ' <li class="' + element.type + '">' + element.name + '</li>';
+			});
+			
+			var programContent = 
+				'<div class="day-program">' +
+		        '	<div class="station">' + element.stationName + '</div>' +
+				'	<ol class="employees">' +
+				employeesList +
+				'	</ol>' +
+				'</div>';
+			$('#day-programs').append(programContent);
+		});
+	});
 }
 
 var months = ['Ianuarie','Februarie','Martie','Aprile','Mai','Iunie','Iulie','August','Septemberbie','Octoberbrie','Noiembrie','Decembrie'];
@@ -240,6 +264,20 @@ function navigateDayPrograms(direction) {
 	var day = dateTxt.split('-')[2];
 	var month = months[parseInt(dateTxt.split('-')[1]) - 1];
 	loadProgramsForDay(day + ' ' + month + ' ' + year);
+}
+
+function generatePrograms() {
+	if ($('#calendar-programs').is(":visible")) {
+		console.log('generate for calendar');
+	}
+	if ($('#day-programs').is(":visible")) {
+		var currentDate = new Date(Date.parse($('#day-programs .calendar-curr-month').html()));
+		var dateString = currentDate.getFullYear() + '-' + (currentDate.getMonth() + 1) + '-' + currentDate.getDate();
+		$.ajax({
+			url: "programDay?dayOfProgram=" + dateString,
+			method: "PUT"
+		});
+	}
 }
 
 function getString(text) {

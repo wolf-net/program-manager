@@ -1,12 +1,18 @@
 package ro.wolfnet.programmanager.api;
 
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import ro.wolfnet.programmanager.model.ProgramModel;
 import ro.wolfnet.programmanager.service.ProgramService;
 
 /**
@@ -27,9 +33,21 @@ public class ProgramController {
    *
    * @return the programs
    */
-  @RequestMapping(value = "/program", method = RequestMethod.GET)
-  public ResponseEntity<Void> getPrograms() {
-    programService.findAll();
+  @RequestMapping(value = "/programDay", method = RequestMethod.GET)
+  public ResponseEntity<List<ProgramModel>> getPrograms(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
+    List<ProgramModel> programs = programService.findAllForOneDay(dayOfProgram);
+    return new ResponseEntity<List<ProgramModel>>(programs, HttpStatus.OK);
+  }
+  
+  /**
+   * Generate program for one day.
+   *
+   * @param dayOfProgram the day of program
+   * @return the response entity
+   */
+  @RequestMapping(value = "/programDay", method = RequestMethod.PUT)
+  public ResponseEntity<Void> generateProgramsForOneDay(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
+    programService.generateProgramsForOneDay(dayOfProgram);
     return new ResponseEntity<Void>(HttpStatus.OK);
   }
 

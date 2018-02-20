@@ -1,24 +1,144 @@
 package ro.wolfnet.programmanager.service;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.ProgramEntity;
+import ro.wolfnet.programmanager.model.EmployeeModel;
+import ro.wolfnet.programmanager.model.ProgramModel;
+import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.ProgramRepository;
 
+/**
+ * The Class ProgramService.
+ *
+ * @author isti
+ * @since Feb 20, 2018
+ */
 @Service
 public class ProgramService {
 
+  /** The program repository. */
   @Autowired
   private ProgramRepository programRepository;
-  
+
+  /** The station service. */
+  @Autowired
+  private StationService stationService;
+
+  /** The employee service. */
+  @Autowired
+  private EmployeeService employeeService;
+
+  /**
+   * Insert dummy.
+   */
   public void insertDummy() {
     ProgramEntity program = new ProgramEntity();
     programRepository.save(program);
   }
-  
-  public void findAll() {
-    programRepository.findAll();
+
+  /**
+   * Find all.
+   * @param dayOfProgram 
+   *
+   * @return the list
+   */
+  public List<ProgramModel> findAllForOneDay(Date dayOfProgram) {
+    List<ProgramEntity> entities = programRepository.findAll(dayOfProgram);
+    List<ProgramModel> models = new ArrayList<>();
+    for (ProgramEntity entity : entities) {
+      int stationIdx = models.indexOf(new ProgramModel(entity.getStation().getName()));
+      if (stationIdx > -1) {
+        models.get(stationIdx).appendEmployee(employeeService.getModelFromEntity(entity.getEmployee()));
+      }
+      else {
+        models.add(getModelFromEntity(entity));
+      }
+    }
+    return models;
+  }
+
+  /**
+   * Gets the model from entity.
+   *
+   * @param entity the entity
+   * @return the model from entity
+   */
+  private ProgramModel getModelFromEntity(ProgramEntity entity) {
+    if (entity == null) {
+      return null;
+    }
+
+    ProgramModel model = new ProgramModel();
+    model.setStationName(entity.getStation().getName());
+    model.appendEmployee(employeeService.getModelFromEntity(entity.getEmployee()));
+    return model;
+  }
+
+  /**
+   * Generate program for one day.
+   *
+   * @param dayOfProgram the day of program
+   */
+  public void generateProgramsForOneDay(Date dayOfProgram) {
+    try {
+      List<StationModel> allStations = stationService.findAll();
+      List<EmployeeModel> allEmployees = employeeService.findAll();
+      List<ProgramEntity> programsForDay = new ArrayList<>();
+      for (StationModel station : allStations) {
+        programsForDay.addAll(getProgramsForStation(station, dayOfProgram, allEmployees));
+      }
+      programRepository.save(programsForDay);
+    } catch (Exception e) {
+      System.out.println("Error generating programs for day: " + dayOfProgram + "! " + e.getMessage());
+    }
+  }
+
+  /**
+   * Gets the programs for station.
+   *
+   * @param station the station
+   * @param date the date
+   * @param allEmployees the all employees
+   * @return the programs for station
+   * @throws Exception the exception
+   */
+  private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeModel> allEmployees) throws Exception {
+    if (station == null || station.getCapacity() == 0) {
+      throw new Exception("Missing station!");
+    }
+
+    List<ProgramEntity> newPrograms = new ArrayList<>();
+    for (int cnt = 0; cnt < station.getCapacity(); cnt++) {
+      ProgramEntity program = new ProgramEntity();
+      program.setEmployee(getRandomEmployeeModelFromList(allEmployees));
+      program.setStation(stationService.getEntityFromModel(station));
+      program.setDate(date);
+      newPrograms.add(program);
+    }
+    return newPrograms;
+  }
+
+  /**
+   * Gets the random employee model from list.
+   *
+   * @param allEmployees the all employees
+   * @return the random employee model from list
+   * @throws Exception the exception
+   */
+  private EmployeeEntity getRandomEmployeeModelFromList(List<EmployeeModel> allEmployees) throws Exception {
+    if (allEmployees == null || allEmployees.size() == 0) {
+      throw new Exception("Missing employees!");
+    }
+
+    int idx = (int) (Math.random() * allEmployees.size());
+    return employeeService.getEntityFromModel(allEmployees.get(idx));
   }
 
 }
