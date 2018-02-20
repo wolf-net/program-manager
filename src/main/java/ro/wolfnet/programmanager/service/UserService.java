@@ -46,15 +46,6 @@ public class UserService {
   }
 
   /**
-   * The main method.
-   *
-   * @param args the arguments
-   */
-  public static void main(String[] args) {
-    System.out.println(new BCryptPasswordEncoder().encode("isti"));
-  }
-
-  /**
    * Change password.
    *
    * @param name the name
