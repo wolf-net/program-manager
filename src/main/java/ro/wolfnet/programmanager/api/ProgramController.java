@@ -50,5 +50,17 @@ public class ProgramController {
     programService.generateProgramsForOneDay(dayOfProgram);
     return new ResponseEntity<Void>(HttpStatus.OK);
   }
+  
+  /**
+   * Generate programs for one month.
+   *
+   * @param dayOfProgram the day of program
+   * @return the response entity
+   */
+  @RequestMapping(value = "/programMonth", method = RequestMethod.PUT)
+  public ResponseEntity<Void> generateProgramsForOneMonth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
+    programService.generateProgramsForOneMonth(dayOfProgram);
+    return new ResponseEntity<Void>(HttpStatus.OK);
+  }
 
 }

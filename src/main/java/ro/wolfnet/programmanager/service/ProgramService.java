@@ -1,6 +1,7 @@
 package ro.wolfnet.programmanager.service;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -45,8 +46,8 @@ public class ProgramService {
 
   /**
    * Find all.
-   * @param dayOfProgram 
    *
+   * @param dayOfProgram the day of program
    * @return the list
    */
   public List<ProgramModel> findAllForOneDay(Date dayOfProgram) {
@@ -139,7 +140,49 @@ public class ProgramService {
     }
 
     int idx = (int) (Math.random() * allEmployees.size());
-    return employeeService.getEntityFromModel(allEmployees.get(idx));
+    EmployeeModel chosenEmployee = allEmployees.get(idx);
+    allEmployees.remove(chosenEmployee);
+    return employeeService.getEntityFromModel(chosenEmployee);
+  }
+
+  /**
+   * Generate programs for one month.
+   *
+   * @param monthDay the month day
+   */
+  public void generateProgramsForOneMonth(Date monthDay) {
+    List<Date> datesOfMonth = getAllDaysFromMonth(monthDay);
+    if (datesOfMonth == null || datesOfMonth.size() == 0) {
+      System.out.println("Missing month dates!");
+      return;
+    }
+
+    for (Date date : datesOfMonth) {
+      generateProgramsForOneDay(date);
+    }
+  }
+
+  /**
+   * Gets the all days from month.
+   *
+   * @param monthDay the month day
+   * @return the all days from month
+   */
+  private List<Date> getAllDaysFromMonth(Date monthDay) {
+    if (monthDay == null) {
+      return null;
+    }
+
+    List<Date> dates = new ArrayList<>();
+    Calendar calendar = Calendar.getInstance();
+    calendar.setTime(monthDay);
+    calendar.set(Calendar.DAY_OF_MONTH, 1);
+    int month = calendar.get(Calendar.MONTH);
+    while (month == calendar.get(Calendar.MONTH)) {
+      dates.add(calendar.getTime());
+      calendar.add(Calendar.DAY_OF_MONTH, 1);
+    }
+    return dates;
   }
 
 }

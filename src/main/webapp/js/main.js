@@ -266,7 +266,11 @@ function navigateDayPrograms(direction) {
 
 function generatePrograms() {
 	if ($('#calendar-programs').is(":visible")) {
-		console.log('generate for calendar');
+		var date = $('#calendar-programs .calendar-curr-month').html();
+		$.ajax({
+			url: "programMonth?dayOfProgram=" + getDateFromDisplay(date),
+			method: "PUT"
+		});
 	}
 	if ($('#day-programs').is(":visible")) {
 		var date = $('#day-programs #calendar-curr-date').val();
@@ -301,6 +305,12 @@ function displayDate(date) {
 	if (day.length < 2) day = '0' + day;
 	
 	return day + ' ' + month + ' ' + year;
+}
+
+function getDateFromDisplay(date) {
+	var month = months.indexOf(date.split(' ')[0]) + 1;
+	var year = date.split(' ')[1];
+	return year + '-' + month + '-1';
 }
 
 function getString(text) {
