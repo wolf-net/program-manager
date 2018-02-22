@@ -2,6 +2,8 @@ package ro.wolfnet.programmanager.service;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.ProgramEntity;
 import ro.wolfnet.programmanager.model.EmployeeModel;
+import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
 import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.ProgramRepository;
@@ -90,7 +93,7 @@ public class ProgramService {
   public void generateProgramsForOneDay(Date dayOfProgram) {
     try {
       List<StationModel> allStations = stationService.findAll();
-      List<EmployeeModel> allEmployees = employeeService.findAll();
+      List<EmployeeStatusModel> allEmployees = getSortedEmployeeStatuses();
       List<ProgramEntity> programsForDay = new ArrayList<>();
       for (StationModel station : allStations) {
         programsForDay.addAll(getProgramsForStation(station, dayOfProgram, allEmployees));
@@ -103,6 +106,23 @@ public class ProgramService {
   }
 
   /**
+   * Gets the sorted employee statuses.
+   *
+   * @return the sorted employee statuses
+   */
+  private List<EmployeeStatusModel> getSortedEmployeeStatuses() {
+    List<EmployeeStatusModel> employeeStatuses = employeeService.findEmployeeStatuses();
+    Collections.sort(employeeStatuses, new Comparator<EmployeeStatusModel>() {
+
+      @Override
+      public int compare(EmployeeStatusModel o1, EmployeeStatusModel o2) {
+        return new Integer(o1.getWorkedHours()).compareTo(new Integer(o2.getWorkedHours()));
+      }
+    });
+    return null;
+  }
+
+  /**
    * Gets the programs for station.
    *
    * @param station the station
@@ -111,7 +131,7 @@ public class ProgramService {
    * @return the programs for station
    * @throws Exception the exception
    */
-  private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeModel> allEmployees) throws Exception {
+  private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeStatusModel> allEmployees) throws Exception {
     if (station == null || station.getCapacity() == 0) {
       throw new Exception("Missing station!");
     }
@@ -134,7 +154,7 @@ public class ProgramService {
    * @return the random employee model from list
    * @throws Exception the exception
    */
-  private EmployeeEntity getRandomEmployeeModelFromList(List<EmployeeModel> allEmployees) throws Exception {
+  private EmployeeEntity getRandomEmployeeModelFromList(List<EmployeeStatusModel> allEmployees) throws Exception {
     if (allEmployees == null || allEmployees.size() == 0) {
       throw new Exception("Missing employees!");
     }

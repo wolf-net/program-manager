@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ro.wolfnet.programmanager.entity.EmployeeEntity;
+import ro.wolfnet.programmanager.entity.ProgramEntity;
 import ro.wolfnet.programmanager.model.EmployeeModel;
+import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.repository.EmployeeRepository;
+import ro.wolfnet.programmanager.repository.ProgramRepository;
 
 /**
  * The Class EmployeeService.
@@ -22,6 +25,10 @@ public class EmployeeService {
   /** The employee repository. */
   @Autowired
   private EmployeeRepository employeeRepository;
+
+  /** The program repository. */
+  @Autowired
+  private ProgramRepository programRepository;
 
   /**
    * Find all.
@@ -147,6 +154,41 @@ public class EmployeeService {
       return "red";
     }
     return null;
+  }
+
+  /**
+   * Find employee statuses.
+   *
+   * @return the list
+   */
+  public List<EmployeeStatusModel> findEmployeeStatuses() {
+    List<EmployeeModel> employees = this.findAll();
+    List<ProgramEntity> programs = programRepository.findAll();
+    List<EmployeeStatusModel> employeeStatuses = new ArrayList<>();
+    for (EmployeeModel employee : employees) {
+      EmployeeStatusModel employeeStatus = new EmployeeStatusModel(employee);
+      employeeStatus.setWorkedHours(getWorkedHoursOfEmployeeFromPrograms(employee, programs));
+      employeeStatuses.add(employeeStatus);
+    }
+    return employeeStatuses;
+  }
+
+  /**
+   * Gets the worked hours of employee from programs.
+   *
+   * @param employee the employee
+   * @param programs the programs
+   * @return the worked hours of employee from programs
+   */
+  private int getWorkedHoursOfEmployeeFromPrograms(EmployeeModel employee, List<ProgramEntity> programs) {
+    int workedHours = 0;
+    for (ProgramEntity program : programs) {
+      if (program.getEmployee().getId() != employee.getId()) {
+        continue;
+      }
+      workedHours += 24;
+    }
+    return workedHours;
   }
 
 }
