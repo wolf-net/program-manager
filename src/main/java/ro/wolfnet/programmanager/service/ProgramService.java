@@ -141,6 +141,7 @@ public class ProgramService {
       ProgramEntity program = new ProgramEntity();
       program.setEmployee(getRandomEmployeeModelFromList(allEmployees));
       program.setStation(stationService.getEntityFromModel(station));
+      program.setWorkedHours(24);
       program.setDate(date);
       newPrograms.add(program);
     }

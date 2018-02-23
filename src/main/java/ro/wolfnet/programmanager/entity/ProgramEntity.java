@@ -25,6 +25,9 @@ public class ProgramEntity {
   /** The employee. */
   private EmployeeEntity employee;
 
+  /** The worked hours. */
+  private int workedHours;
+
   /**
    * Gets the id.
    *
@@ -101,5 +104,23 @@ public class ProgramEntity {
    */
   public void setEmployee(EmployeeEntity employee) {
     this.employee = employee;
+  }
+
+  /**
+   * Gets the worked hours.
+   *
+   * @return the worked hours
+   */
+  public int getWorkedHours() {
+    return workedHours;
+  }
+
+  /**
+   * Sets the worked hours.
+   *
+   * @param workedHours the new worked hours
+   */
+  public void setWorkedHours(int workedHours) {
+    this.workedHours = workedHours;
   }
 }

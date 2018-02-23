@@ -186,7 +186,7 @@ public class EmployeeService {
       if (program.getEmployee().getId() != employee.getId()) {
         continue;
       }
-      workedHours += 24;
+      workedHours += program.getWorkedHours();
     }
     return workedHours;
   }
