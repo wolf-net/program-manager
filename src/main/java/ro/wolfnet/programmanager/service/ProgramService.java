@@ -119,7 +119,7 @@ public class ProgramService {
         return new Integer(o1.getWorkedHours()).compareTo(new Integer(o2.getWorkedHours()));
       }
     });
-    return null;
+    return employeeStatuses;
   }
 
   /**
@@ -159,10 +159,31 @@ public class ProgramService {
       throw new Exception("Missing employees!");
     }
 
-    int idx = (int) (Math.random() * allEmployees.size());
+    int lastLessWorkingHourIdx = getLatsLessWorkedIndex(allEmployees);
+    int idx = (int) (Math.random() * (lastLessWorkingHourIdx - 0)) + 0;
     EmployeeModel chosenEmployee = allEmployees.get(idx);
     allEmployees.remove(chosenEmployee);
     return employeeService.getEntityFromModel(chosenEmployee);
+  }
+
+  /**
+   * Gets the lats less worked index.
+   *
+   * @param allEmployees the all employees
+   * @return the lats less worked index
+   * @throws Exception the exception
+   */
+  private int getLatsLessWorkedIndex(List<EmployeeStatusModel> allEmployees) throws Exception {
+    if (allEmployees == null || allEmployees.size() == 0) {
+      throw new Exception("Missing employees!");
+    }
+
+    int lessWorkingHour = allEmployees.get(0).getWorkedHours();
+    int index = 0;
+    while (index < allEmployees.size() && allEmployees.get(index).getWorkedHours() == lessWorkingHour) {
+      index++;
+    }
+    return index-1;
   }
 
   /**
