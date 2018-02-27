@@ -101,6 +101,10 @@ function loadEmployees() {
 			'  <div class="card-content">' +
 			'	<form id="new-employee">' +
 			'		<input type="text" name="name-input" placeholder="Name" />' +
+			'		<select class="js-example-basic-multiple" name="states[]" multiple="multiple">' +
+			'			<option value="AL">Alabama</option>' +
+			'			<option value="WY">Wyoming</option>' +
+			'		</select>' +
 			'		<textarea name="note-input" placeholder="Notes"></textarea>' +
 			'		<div class="colors-select">' +
 			'			<input type="radio" name="type-input" class="color black" value="black" checked="checked">' +
@@ -112,6 +116,7 @@ function loadEmployees() {
 			' </div>' +
 			'</div>';
 		$('#section-3 .cards-list-container').append(cardContent);
+		$('.js-example-basic-multiple').select2();
 	});
 }
 

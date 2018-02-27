@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -22,21 +24,24 @@ public class EmployeeEntity {
 
   /** The id. */
   private Long id;
-  
+
   /** The name. */
   private String name;
-  
+
   /** The note. */
   private String note;
-  
+
   /** The type. */
   private int type;
-  
+
   /** The status. */
   private int status;
 
   /** The programs. */
   private Set<ProgramEntity> programs;
+
+  /** The stations. */
+  private Set<StationEntity> stations;
 
   /**
    * Gets the id.
@@ -147,6 +152,26 @@ public class EmployeeEntity {
    */
   public void setPrograms(Set<ProgramEntity> programs) {
     this.programs = programs;
+  }
+
+  /**
+   * Gets the stations.
+   *
+   * @return the stations
+   */
+  @ManyToMany
+  @JoinColumn(name = "station_entity_id")
+  public Set<StationEntity> getStations() {
+    return stations;
+  }
+
+  /**
+   * Sets the stations.
+   *
+   * @param stations the new stations
+   */
+  public void setStations(Set<StationEntity> stations) {
+    this.stations = stations;
   }
 
 }

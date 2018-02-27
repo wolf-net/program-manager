@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -19,18 +20,21 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "station_entity")
 public class StationEntity {
-  
+
   /** The id. */
   private long id;
-  
+
   /** The name. */
   private String name;
-  
+
   /** The capacity. */
   private int capacity;
-  
+
   /** The programs. */
   private Set<ProgramEntity> programs;
+
+  /** The employees. */
+  private Set<EmployeeEntity> employees;
 
   /**
    * Gets the id.
@@ -105,5 +109,24 @@ public class StationEntity {
    */
   public void setPrograms(Set<ProgramEntity> programs) {
     this.programs = programs;
+  }
+
+  /**
+   * Gets the employees.
+   *
+   * @return the employees
+   */
+  @ManyToMany(mappedBy = "stations", cascade = CascadeType.ALL)
+  public Set<EmployeeEntity> getEmployees() {
+    return employees;
+  }
+
+  /**
+   * Sets the employees.
+   *
+   * @param employees the new employees
+   */
+  public void setEmployees(Set<EmployeeEntity> employees) {
+    this.employees = employees;
   }
 }
