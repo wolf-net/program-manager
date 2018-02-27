@@ -221,10 +221,10 @@ input[type='radio'].color.red:checked:after {
     font-size: 70%;
 }
 
-input, textarea {
+input, textarea, .select2 {
 	margin: 0.25em 0;
 	font-size: 1em;
-	width: 100%;
+	width: 100% !important;
 }
 
 /* Icons */

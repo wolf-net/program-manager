@@ -116,7 +116,22 @@ function loadEmployees() {
 			' </div>' +
 			'</div>';
 		$('#section-3 .cards-list-container').append(cardContent);
-		$('.js-example-basic-multiple').select2();
+		
+		$('.js-example-basic-multiple').select2({
+			ajax: {
+				method: "GET",
+				url: "station",
+				processResults: function (data) {
+					var results = $.map(data, function(station) {
+						return {
+						  "id": station.id,
+						  "text": station.name
+						};
+					});
+					return {"results": results};
+				}
+			}
+		});
 	});
 }
 
