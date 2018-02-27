@@ -163,7 +163,6 @@ public class EmployeeService {
    */
   public List<EmployeeStatusModel> findEmployeeStatuses() {
     List<EmployeeModel> employees = this.findAll();
-    //TODO: BUG!!!! ignore day that will be regenerated
     List<ProgramEntity> programs = programRepository.findAll();
     List<EmployeeStatusModel> employeeStatuses = new ArrayList<>();
     for (EmployeeModel employee : employees) {

@@ -92,13 +92,14 @@ public class ProgramService {
    */
   public void generateProgramsForOneDay(Date dayOfProgram) {
     try {
+      programRepository.deleteByDate(dayOfProgram);
+      
       List<StationModel> allStations = stationService.findAll();
       List<EmployeeStatusModel> allEmployees = getSortedEmployeeStatuses();
       List<ProgramEntity> programsForDay = new ArrayList<>();
       for (StationModel station : allStations) {
         programsForDay.addAll(getProgramsForStation(station, dayOfProgram, allEmployees));
       }
-      programRepository.deleteByDate(dayOfProgram);
       programRepository.save(programsForDay);
     } catch (Exception e) {
       System.out.println("Error generating programs for day: " + dayOfProgram + "! " + e.getMessage());
@@ -199,6 +200,9 @@ public class ProgramService {
       return;
     }
 
+    for (Date date : datesOfMonth) {
+      programRepository.deleteByDate(date);
+    }
     for (Date date : datesOfMonth) {
       generateProgramsForOneDay(date);
     }
