@@ -24,7 +24,7 @@ public class EmployeeModel {
   private int status;
 
   /** The stations. */
-  private String[] stationIds;
+  private long[] stationIds;
 
   /** The station names. */
   private String[] stationNames;
@@ -124,7 +124,7 @@ public class EmployeeModel {
    *
    * @return the station ids
    */
-  public String[] getStationIds() {
+  public long[] getStationIds() {
     return stationIds;
   }
 
@@ -133,7 +133,7 @@ public class EmployeeModel {
    *
    * @param stationIds the new station ids
    */
-  public void setStationIds(String[] stationIds) {
+  public void setStationIds(long[] stationIds) {
     this.stationIds = stationIds;
   }
 

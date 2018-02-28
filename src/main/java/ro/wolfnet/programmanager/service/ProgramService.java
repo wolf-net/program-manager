@@ -10,13 +10,12 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.ProgramEntity;
-import ro.wolfnet.programmanager.model.EmployeeModel;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
 import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.ProgramRepository;
+import ro.wolfnet.programmanager.service.generate.GenerateRule;
 
 /**
  * The Class ProgramService.
@@ -95,7 +94,7 @@ public class ProgramService {
       programRepository.deleteByDate(dayOfProgram);
       
       List<StationModel> allStations = stationService.findAll();
-      List<EmployeeStatusModel> allEmployees = getSortedEmployeeStatuses();
+      List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
       List<ProgramEntity> programsForDay = new ArrayList<>();
       for (StationModel station : allStations) {
         programsForDay.addAll(getProgramsForStation(station, dayOfProgram, allEmployees));
@@ -104,23 +103,6 @@ public class ProgramService {
     } catch (Exception e) {
       System.out.println("Error generating programs for day: " + dayOfProgram + "! " + e.getMessage());
     }
-  }
-
-  /**
-   * Gets the sorted employee statuses.
-   *
-   * @return the sorted employee statuses
-   */
-  private List<EmployeeStatusModel> getSortedEmployeeStatuses() {
-    List<EmployeeStatusModel> employeeStatuses = employeeService.findEmployeeStatuses();
-    Collections.sort(employeeStatuses, new Comparator<EmployeeStatusModel>() {
-
-      @Override
-      public int compare(EmployeeStatusModel o1, EmployeeStatusModel o2) {
-        return new Integer(o1.getWorkedHours()).compareTo(new Integer(o2.getWorkedHours()));
-      }
-    });
-    return employeeStatuses;
   }
 
   /**
@@ -139,8 +121,11 @@ public class ProgramService {
 
     List<ProgramEntity> newPrograms = new ArrayList<>();
     for (int cnt = 0; cnt < station.getCapacity(); cnt++) {
+      EmployeeStatusModel chosenEmployee = getRandomEmployeeModelFromList(allEmployees);
+      allEmployees.remove(chosenEmployee);
+      
       ProgramEntity program = new ProgramEntity();
-      program.setEmployee(getRandomEmployeeModelFromList(allEmployees));
+      program.setEmployee(employeeService.getEntityFromModel(chosenEmployee));
       program.setStation(stationService.getEntityFromModel(station));
       program.setWorkedHours(24);
       program.setDate(date);
@@ -156,16 +141,26 @@ public class ProgramService {
    * @return the random employee model from list
    * @throws Exception the exception
    */
-  private EmployeeEntity getRandomEmployeeModelFromList(List<EmployeeStatusModel> allEmployees) throws Exception {
+  private EmployeeStatusModel getRandomEmployeeModelFromList(List<EmployeeStatusModel> allEmployees) throws Exception {
     if (allEmployees == null || allEmployees.size() == 0) {
       throw new Exception("Missing employees!");
     }
+    
+    List<GenerateRule> rules = new ArrayList<>();
+    for (GenerateRule rule:rules) {
+    	allEmployees = rule.filterEmployees(allEmployees);
+    }
+    
+    Collections.sort(allEmployees, new Comparator<EmployeeStatusModel>() {
+	    @Override
+	    public int compare(EmployeeStatusModel o1, EmployeeStatusModel o2) {
+	      return new Integer(o1.getWorkedHours()).compareTo(new Integer(o2.getWorkedHours()));
+	    }
+	});
 
     int lastLessWorkingHourIdx = getLatsLessWorkedIndex(allEmployees);
     int idx = (int) (Math.random() * (lastLessWorkingHourIdx - 0)) + 0;
-    EmployeeModel chosenEmployee = allEmployees.get(idx);
-    allEmployees.remove(chosenEmployee);
-    return employeeService.getEntityFromModel(chosenEmployee);
+    return allEmployees.get(idx);
   }
 
   /**

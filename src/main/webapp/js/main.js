@@ -93,6 +93,7 @@ function loadEmployees() {
 				'	 <input type="hidden" name="note-input" value="' + element.note + '" /> ' +
 				'	 <input type="hidden" name="station-input" value="' + element.stationIds + '" /> ' +
 				'	 <div class="name-display">' + element.name + '</div>' +
+				'	 <div class="station-display">Station(s): ' + element.stationNames + '</div>' +
 				'    <div class="note-display">' + getString(element.note, '(missing note)').replace('\n', '<br/>') + '</div>' +
 				'  </div>' +
 				'</div>';
@@ -143,7 +144,10 @@ function initializeEmployeeStationInput(jInput) {
 		jInput.next('.select2').css('width', '');
 		jInput.next('.select2').find('.select2-search__field').css('width', '');
 		if (jInput.attr('value') != undefined) {
-			jInput.select2('val', jInput.attr('value').split(','));
+			var stationIds = $.map(jInput.attr('value').split(','), function(val, i) {
+				return parseInt(val);
+			});
+			jInput.select2('val', [stationIds]);
 		}
 	});
 }

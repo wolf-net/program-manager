@@ -710,4 +710,12 @@ p.info {
 	height: 35em;
 }
 
+.card-content .select2-selection__choice__remove {
+	font-size: 2em;
+    line-height: 0.4;
+    position: relative;
+    top: 10px;
+    width: 0.7em;
+}
+
 

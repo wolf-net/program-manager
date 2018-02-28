@@ -1,10 +1,9 @@
 package ro.wolfnet.programmanager.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import ro.wolfnet.programmanager.entity.StationEntity;
 import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.StationRepository;
-import ro.wolfnet.programmanager.utils.Utils;
 
 /**
  * The Class StationService.
@@ -105,12 +103,16 @@ public class StationService {
    * @param stations the stations
    * @return the stations from ids
    */
-  public Set<StationEntity> getEntitiesFromIds(String[] stations) {
+  public Set<StationEntity> getEntitiesFromIds(long[] stations) {
     if (stations == null) {
       return null;
     }
 
-    return Arrays.asList(stations).stream().map(stationId -> getEntityFromParams(Utils.getIntAttribute(stationId))).collect(Collectors.toSet());
+    Set<StationEntity> result = new HashSet<>();
+    for (long stationId:stations) {
+    	result.add(getEntityFromParams(stationId));
+    }
+    return result;
   }
 
   /**
@@ -119,7 +121,7 @@ public class StationService {
    * @param stationId the station id
    * @return the station entity
    */
-  private StationEntity getEntityFromParams(int stationId) {
+  private StationEntity getEntityFromParams(long stationId) {
     StationEntity entity = new StationEntity();
     entity.setId(stationId);
     return entity;
@@ -145,12 +147,12 @@ public class StationService {
    * @param stations the stations
    * @return the ids from entities
    */
-  public String[] getIdsFromEntities(Set<StationEntity> stations) {
+  public long[] getIdsFromEntities(Set<StationEntity> stations) {
     if (stations == null) {
       return null;
     }
-
-    return stations.stream().map(station -> String.valueOf(station.getId())).toArray(String[]::new);
+ 
+    return stations.stream().map(station -> station.getId()).mapToLong(Long::longValue).toArray();
   }
 
 }
