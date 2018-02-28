@@ -1,7 +1,10 @@
 package ro.wolfnet.programmanager.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -9,6 +12,7 @@ import org.springframework.stereotype.Service;
 import ro.wolfnet.programmanager.entity.StationEntity;
 import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.StationRepository;
+import ro.wolfnet.programmanager.utils.Utils;
 
 /**
  * The Class StationService.
@@ -93,6 +97,60 @@ public class StationService {
    */
   public void deleteById(long stationId) {
     this.stationRepository.delete(stationId);
+  }
+
+  /**
+   * Gets the stations from ids.
+   *
+   * @param stations the stations
+   * @return the stations from ids
+   */
+  public Set<StationEntity> getEntitiesFromIds(String[] stations) {
+    if (stations == null) {
+      return null;
+    }
+
+    return Arrays.asList(stations).stream().map(stationId -> getEntityFromParams(Utils.getIntAttribute(stationId))).collect(Collectors.toSet());
+  }
+
+  /**
+   * Gets the station entity.
+   *
+   * @param stationId the station id
+   * @return the station entity
+   */
+  private StationEntity getEntityFromParams(int stationId) {
+    StationEntity entity = new StationEntity();
+    entity.setId(stationId);
+    return entity;
+  }
+
+  /**
+   * Gets the names from entities.
+   *
+   * @param stations the stations
+   * @return the names from entities
+   */
+  public String[] getNamesFromEntities(Set<StationEntity> stations) {
+    if (stations == null) {
+      return null;
+    }
+
+    return stations.stream().map(station -> station.getName()).toArray(String[]::new);
+  }
+
+  /**
+   * Gets the ids from entities.
+   *
+   * @param stations the stations
+   * @return the ids from entities
+   */
+  public String[] getIdsFromEntities(Set<StationEntity> stations) {
+    if (stations == null) {
+      return null;
+    }
+
+    return stations.stream().map(station -> String.valueOf(station.getId())).toArray(String[]::new);
   }
 
 }

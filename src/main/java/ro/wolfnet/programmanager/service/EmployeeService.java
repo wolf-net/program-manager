@@ -29,6 +29,9 @@ public class EmployeeService {
   /** The program repository. */
   @Autowired
   private ProgramRepository programRepository;
+  
+  @Autowired
+  private StationService stationService;
 
   /**
    * Find all.
@@ -76,6 +79,7 @@ public class EmployeeService {
     entity.setNote(model.getNote());
     entity.setStatus(model.getStatus());
     entity.setType(getEntityTypeFromModelType(model.getType()));
+    entity.setStations(stationService.getEntitiesFromIds(model.getStationIds()));
     return entity;
   }
 
@@ -112,6 +116,8 @@ public class EmployeeService {
     model.setNote(entity.getNote());
     model.setStatus(entity.getStatus());
     model.setType(getModelTypeFromEntityType(entity.getType()));
+    model.setStationNames(stationService.getNamesFromEntities(entity.getStations()));
+    model.setStationIds(stationService.getIdsFromEntities(entity.getStations()));
     return model;
   }
 

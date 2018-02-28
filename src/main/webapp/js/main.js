@@ -27,7 +27,8 @@ function saveEmployee(saveButton) {
 		id: jContent.find('input[name="id-input"]').val(),
 		name: jContent.find('input[name="name-input"]').val(),
 		note: jContent.find('textarea[name="note-input"]').val(),
-		type: jContent.find('[name="type-input"]:checked').val()
+		type: jContent.find('[name="type-input"]:checked').val(),
+		stationIds: jContent.find('[name="station-input"]').val()
 	};
 	$.ajax({
 		url: "employee",
@@ -56,7 +57,7 @@ function editEmployee(editButton) {
 		'	<form id="edit-employee_' + employeeId + '">' +
 		'		<input type="hidden" name="id-input" value="' + employeeId + '" />' +
 		'		<input type="text" name="name-input" placeholder="Name" value="' + jContent.find('.name-display').html() + '" />' +
-		'		<select name="station-input" multiple="multiple" />' +
+		'		<select name="station-input" multiple="multiple" value="' + jContent.find('[name="station-input"]').val() + '" /> ' +
 		'		<textarea name="note-input" placeholder="Notes">' + jContent.find('input[name="note-input"]').val() + '</textarea>' +
 		'		<div class="colors-select">' +
 		'			<input type="radio" name="type-input" class="color black" value="black" ' + blackChecked + '>' +
@@ -90,6 +91,7 @@ function loadEmployees() {
 				'	 <input type="hidden" name="id-input" value="' + element.id + '" /> ' +
 				'	 <input type="hidden" name="type-input" value="' + element.type + '" /> ' +
 				'	 <input type="hidden" name="note-input" value="' + element.note + '" /> ' +
+				'	 <input type="hidden" name="station-input" value="' + element.stationIds + '" /> ' +
 				'	 <div class="name-display">' + element.name + '</div>' +
 				'    <div class="note-display">' + getString(element.note, '(missing note)').replace('\n', '<br/>') + '</div>' +
 				'  </div>' +
@@ -122,24 +124,28 @@ function loadEmployees() {
 }
 
 function initializeEmployeeStationInput(jInput) {
-	jInput.select2({
-		placeholder: "Station",
-		ajax: {
-			method: "GET",
-			url: "station",
-			processResults: function (data) {
-				var results = $.map(data, function(station) {
-					return {
-					  "id": station.id,
-					  "text": station.name
-					};
-				});
-				return {"results": results};
-			}
+	$.ajax({
+		method: "GET",
+		url: "station"
+	}).done(function(response) {
+		results = $.map(response, function(station) {
+			return {
+			  "id": station.id,
+			  "text": station.name
+			};
+		});
+		
+		jInput.select2({
+			placeholder: "Station",
+			data: results
+		});
+		
+		jInput.next('.select2').css('width', '');
+		jInput.next('.select2').find('.select2-search__field').css('width', '');
+		if (jInput.attr('value') != undefined) {
+			jInput.select2('val', jInput.attr('value').split(','));
 		}
 	});
-	jInput.next('.select2').css('width', '');
-	jInput.next('.select2').find('.select2-search__field').css('width', '');
 }
 
 function saveSettings() {
