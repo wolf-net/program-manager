@@ -113,8 +113,9 @@ body {
 }
 
 input,
-textarea {
-	border-radius: 10px;
+textarea,
+.select2-selection {
+	border-radius: 10px !important;
 }
 
 form {
@@ -142,6 +143,10 @@ input[type='radio'].color:after {
 	display: inline-block;
 	visibility: visible;
 	border: 2px solid white;
+}
+
+.select2-results {
+	font-size: 2em;
 }
 
 .card.black {
@@ -224,7 +229,7 @@ input[type='radio'].color.red:checked:after {
 input, textarea, .select2 {
 	margin: 0.25em 0;
 	font-size: 1em;
-	width: 100% !important;
+	width: 100%;
 }
 
 /* Icons */

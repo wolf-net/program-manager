@@ -46,15 +46,17 @@ function editEmployee(editButton) {
 	var blueChecked = jContent.find('[name="type-input"]').val() == 'blue' ? 'checked="checked"' : '';
 	var greenChecked = jContent.find('[name="type-input"]').val() == 'green' ? 'checked="checked"' : '';
 	var redChecked = jContent.find('[name="type-input"]').val() == 'red' ? 'checked="checked"' : '';
+	var employeeId = jContent.find('input[name="id-input"]').val();
 	var cardContent = 
 		'<div class="card">' +
 		'  <div class="card-buttons">' +
 		'	<i class="fa fa-save" onClick="saveEmployee(this)"></i>' +
 		'  </div>' +
-		'  <div class="card-content' +
-		'	<form id="edit-employee">' +
-		'		<input type="hidden" name="id-input" value="' + jContent.find('input[name="id-input"]').val() + '" />' +
+		'  <div class="card-content">' +
+		'	<form id="edit-employee_' + employeeId + '">' +
+		'		<input type="hidden" name="id-input" value="' + employeeId + '" />' +
 		'		<input type="text" name="name-input" placeholder="Name" value="' + jContent.find('.name-display').html() + '" />' +
+		'		<select name="station-input" multiple="multiple" />' +
 		'		<textarea name="note-input" placeholder="Notes">' + jContent.find('input[name="note-input"]').val() + '</textarea>' +
 		'		<div class="colors-select">' +
 		'			<input type="radio" name="type-input" class="color black" value="black" ' + blackChecked + '>' +
@@ -69,6 +71,7 @@ function editEmployee(editButton) {
 		'  </div>' +
 		'</div>';
 	$(editButton).parents('.card').replaceWith(cardContent);
+	initializeEmployeeStationInput($('#edit-employee_' + employeeId + ' [name="station-input"]'));
 }
 
 function loadEmployees() {
@@ -101,10 +104,7 @@ function loadEmployees() {
 			'  <div class="card-content">' +
 			'	<form id="new-employee">' +
 			'		<input type="text" name="name-input" placeholder="Name" />' +
-			'		<select class="js-example-basic-multiple" name="states[]" multiple="multiple">' +
-			'			<option value="AL">Alabama</option>' +
-			'			<option value="WY">Wyoming</option>' +
-			'		</select>' +
+			'		<select name="station-input" multiple="multiple" />' +
 			'		<textarea name="note-input" placeholder="Notes"></textarea>' +
 			'		<div class="colors-select">' +
 			'			<input type="radio" name="type-input" class="color black" value="black" checked="checked">' +
@@ -117,22 +117,29 @@ function loadEmployees() {
 			'</div>';
 		$('#section-3 .cards-list-container').append(cardContent);
 		
-		$('.js-example-basic-multiple').select2({
-			ajax: {
-				method: "GET",
-				url: "station",
-				processResults: function (data) {
-					var results = $.map(data, function(station) {
-						return {
-						  "id": station.id,
-						  "text": station.name
-						};
-					});
-					return {"results": results};
-				}
-			}
-		});
+		initializeEmployeeStationInput($('#new-employee [name="station-input"]'));
 	});
+}
+
+function initializeEmployeeStationInput(jInput) {
+	jInput.select2({
+		placeholder: "Station",
+		ajax: {
+			method: "GET",
+			url: "station",
+			processResults: function (data) {
+				var results = $.map(data, function(station) {
+					return {
+					  "id": station.id,
+					  "text": station.name
+					};
+				});
+				return {"results": results};
+			}
+		}
+	});
+	jInput.next('.select2').css('width', '');
+	jInput.next('.select2').find('.select2-search__field').css('width', '');
 }
 
 function saveSettings() {
