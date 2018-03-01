@@ -1,9 +1,8 @@
 package ro.wolfnet.programmanager.service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +14,9 @@ import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
 import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.ProgramRepository;
+import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
 import ro.wolfnet.programmanager.service.generate.GenerateRule;
+import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
 
 /**
  * The Class ProgramService.
@@ -92,7 +93,7 @@ public class ProgramService {
   public void generateProgramsForOneDay(Date dayOfProgram) {
     try {
       programRepository.deleteByDate(dayOfProgram);
-      
+
       List<StationModel> allStations = stationService.findAll();
       List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
       List<ProgramEntity> programsForDay = new ArrayList<>();
@@ -121,9 +122,9 @@ public class ProgramService {
 
     List<ProgramEntity> newPrograms = new ArrayList<>();
     for (int cnt = 0; cnt < station.getCapacity(); cnt++) {
-      EmployeeStatusModel chosenEmployee = getRandomEmployeeModelFromList(allEmployees);
+      EmployeeStatusModel chosenEmployee = getRandomEmployeeModelFromList(station.getId(), allEmployees);
       allEmployees.remove(chosenEmployee);
-      
+
       ProgramEntity program = new ProgramEntity();
       program.setEmployee(employeeService.getEntityFromModel(chosenEmployee));
       program.setStation(stationService.getEntityFromModel(station));
@@ -134,53 +135,28 @@ public class ProgramService {
     return newPrograms;
   }
 
+  /** The generate rules. */
+  private static List<GenerateRule> generateRules = Arrays.asList(new AssignedStationsRule(), new LessWorkedRule());
+
   /**
    * Gets the random employee model from list.
+   * @param stationId 
    *
    * @param allEmployees the all employees
    * @return the random employee model from list
    * @throws Exception the exception
    */
-  private EmployeeStatusModel getRandomEmployeeModelFromList(List<EmployeeStatusModel> allEmployees) throws Exception {
+  private EmployeeStatusModel getRandomEmployeeModelFromList(long stationId, List<EmployeeStatusModel> allEmployees) throws Exception {
     if (allEmployees == null || allEmployees.size() == 0) {
       throw new Exception("Missing employees!");
     }
-    
-    List<GenerateRule> rules = new ArrayList<>();
-    for (GenerateRule rule:rules) {
-    	allEmployees = rule.filterEmployees(allEmployees);
-    }
-    
-    Collections.sort(allEmployees, new Comparator<EmployeeStatusModel>() {
-	    @Override
-	    public int compare(EmployeeStatusModel o1, EmployeeStatusModel o2) {
-	      return new Integer(o1.getWorkedHours()).compareTo(new Integer(o2.getWorkedHours()));
-	    }
-	});
 
-    int lastLessWorkingHourIdx = getLatsLessWorkedIndex(allEmployees);
-    int idx = (int) (Math.random() * (lastLessWorkingHourIdx - 0)) + 0;
+    for (GenerateRule rule : generateRules) {
+      allEmployees = rule.filterEmployees(stationId, allEmployees);
+    }
+
+    int idx = (int) (Math.random() * (allEmployees.size() - 0)) + 0;
     return allEmployees.get(idx);
-  }
-
-  /**
-   * Gets the lats less worked index.
-   *
-   * @param allEmployees the all employees
-   * @return the lats less worked index
-   * @throws Exception the exception
-   */
-  private int getLatsLessWorkedIndex(List<EmployeeStatusModel> allEmployees) throws Exception {
-    if (allEmployees == null || allEmployees.size() == 0) {
-      throw new Exception("Missing employees!");
-    }
-
-    int lessWorkingHour = allEmployees.get(0).getWorkedHours();
-    int index = 0;
-    while (index < allEmployees.size() && allEmployees.get(index).getWorkedHours() == lessWorkingHour) {
-      index++;
-    }
-    return index-1;
   }
 
   /**

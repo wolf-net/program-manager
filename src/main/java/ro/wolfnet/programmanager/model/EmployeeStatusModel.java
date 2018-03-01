@@ -28,6 +28,8 @@ public class EmployeeStatusModel extends EmployeeModel {
     this.setName(employeeModel.getName());
     this.setNote(employeeModel.getNote());
     this.setType(employeeModel.getType());
+    this.setStationIds(employeeModel.getStationIds());
+    this.setStationNames(employeeModel.getStationNames());
   }
 
   /**
