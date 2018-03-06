@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ro.wolfnet.programmanager.model.ProgramModel;
 import ro.wolfnet.programmanager.service.ProgramService;
+import ro.wolfnet.programmanager.utils.IncompatibleRulesException;
 
 /**
  * The Class ProgramController.
@@ -47,8 +48,12 @@ public class ProgramController {
    */
   @RequestMapping(value = "/programDay", method = RequestMethod.PUT)
   public ResponseEntity<Void> generateProgramsForOneDay(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
-    programService.generateProgramsForOneDay(dayOfProgram);
-    return new ResponseEntity<Void>(HttpStatus.OK);
+    try {
+      programService.generateProgramsForOneDay(dayOfProgram);
+      return new ResponseEntity<Void>(HttpStatus.OK);
+    }catch (IncompatibleRulesException e) {
+      return new ResponseEntity<>(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS);
+    }
   }
   
   /**
@@ -59,8 +64,12 @@ public class ProgramController {
    */
   @RequestMapping(value = "/programMonth", method = RequestMethod.PUT)
   public ResponseEntity<Void> generateProgramsForOneMonth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
-    programService.generateProgramsForOneMonth(dayOfProgram);
-    return new ResponseEntity<Void>(HttpStatus.OK);
+    try {
+      programService.generateProgramsForOneMonth(dayOfProgram);
+      return new ResponseEntity<Void>(HttpStatus.OK);
+    }catch (IncompatibleRulesException e) {
+      return new ResponseEntity<>(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS);
+    }
   }
 
 }

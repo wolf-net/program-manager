@@ -306,18 +306,35 @@ function generatePrograms() {
 		var date = $('#calendar-programs .calendar-curr-month').html();
 		$.ajax({
 			url: "programMonth?dayOfProgram=" + getDateFromDisplay(date),
-			method: "PUT"
+			method: "PUT",
+            error: generateProgramsErrorHandler,
+            beforeSend: generateProgramsErrorBeforeSend
 		});
 	}
 	if ($('#day-programs').is(":visible")) {
 		var date = $('#day-programs #calendar-curr-date').val();
 		$.ajax({
 			url: "programDay?dayOfProgram=" + date,
-			method: "PUT"
+			method: "PUT",
+            error: generateProgramsErrorHandler,
+            beforeSend: generateProgramsErrorBeforeSend
 		}).done(function() {
 			navigateDayPrograms(0);
 		});
 	}
+}
+
+function generateProgramsErrorHandler(request) {
+	if (request.status = 451) {
+		alert('Incompatible rules! Try again!');
+	}
+	else {
+		alert('General error! Try again!');
+	}
+}
+
+function generateProgramsErrorBeforeSend() {
+	$('body').append('<div></div>');
 }
 
 function formatDate(date) {

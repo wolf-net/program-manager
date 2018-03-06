@@ -17,6 +17,7 @@ import ro.wolfnet.programmanager.repository.ProgramRepository;
 import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
 import ro.wolfnet.programmanager.service.generate.GenerateRule;
 import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
+import ro.wolfnet.programmanager.utils.IncompatibleRulesException;
 
 /**
  * The Class ProgramService.
@@ -89,21 +90,62 @@ public class ProgramService {
    * Generate program for one day.
    *
    * @param dayOfProgram the day of program
+   * @throws IncompatibleRulesException the incompatible rules exception
    */
-  public void generateProgramsForOneDay(Date dayOfProgram) {
-    try {
-      programRepository.deleteByDate(dayOfProgram);
+  public void generateProgramsForOneDay(Date dayOfProgram) throws IncompatibleRulesException {
+    programRepository.deleteByDate(dayOfProgram);
 
-      List<StationModel> allStations = stationService.findAll();
-      List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
+    List<StationModel> allStations = stationService.findAll();
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
+    List<ProgramEntity> programsForDay = null;
+    for (long generateStartMillis = System.currentTimeMillis(); programsForDay == null;) {
+      programsForDay = getProgramsForOneDay(dayOfProgram, allStations, copyEmployeeList(allEmployees));
+      if ((System.currentTimeMillis() - generateStartMillis) > 60 * 1000) {
+        throw new IncompatibleRulesException();
+      }
+    }
+
+    programRepository.save(programsForDay);
+  }
+
+  /**
+   * Copy employee list.
+   *
+   * @param allEmployees the all employees
+   * @return the list
+   */
+  private List<EmployeeStatusModel> copyEmployeeList(List<EmployeeStatusModel> allEmployees) {
+    if (allEmployees == null || allEmployees.size() == 0) {
+      return null;
+    }
+
+    List<EmployeeStatusModel> result = new ArrayList<>();
+    for (EmployeeStatusModel employee : allEmployees) {
+      result.add(employee);
+    }
+    return result;
+  }
+
+  /**
+   * Gets the programs for one day.
+   *
+   * @param dayOfProgram the day of program
+   * @param allStations the all stations
+   * @param allEmployees the all employees
+   * @return the programs for one day
+   */
+  private List<ProgramEntity> getProgramsForOneDay(Date dayOfProgram, List<StationModel> allStations, List<EmployeeStatusModel> allEmployees) {
+    try {
       List<ProgramEntity> programsForDay = new ArrayList<>();
       for (StationModel station : allStations) {
         programsForDay.addAll(getProgramsForStation(station, dayOfProgram, allEmployees));
       }
-      programRepository.save(programsForDay);
-    } catch (Exception e) {
-      System.out.println("Error generating programs for day: " + dayOfProgram + "! " + e.getMessage());
+      return programsForDay;
+    } catch (IncompatibleRulesException e) {
+      System.out.println("Failed to generate for day: " + dayOfProgram);
+      //ignore incompatibility and try again
     }
+    return null;
   }
 
   /**
@@ -113,11 +155,11 @@ public class ProgramService {
    * @param date the date
    * @param allEmployees the all employees
    * @return the programs for station
-   * @throws Exception the exception
+   * @throws IncompatibleRulesException the incompatible rules exception
    */
-  private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeStatusModel> allEmployees) throws Exception {
+  private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeStatusModel> allEmployees) throws IncompatibleRulesException {
     if (station == null || station.getCapacity() == 0) {
-      throw new Exception("Missing station!");
+      throw new IncompatibleRulesException();
     }
 
     List<ProgramEntity> newPrograms = new ArrayList<>();
@@ -140,31 +182,36 @@ public class ProgramService {
 
   /**
    * Gets the random employee model from list.
-   * @param stationId 
    *
+   * @param stationId the station id
    * @param allEmployees the all employees
    * @return the random employee model from list
-   * @throws Exception the exception
+   * @throws IncompatibleRulesException the incompatible rules exception
    */
-  private EmployeeStatusModel getRandomEmployeeModelFromList(long stationId, List<EmployeeStatusModel> allEmployees) throws Exception {
+  private EmployeeStatusModel getRandomEmployeeModelFromList(long stationId, List<EmployeeStatusModel> allEmployees) throws IncompatibleRulesException {
     if (allEmployees == null || allEmployees.size() == 0) {
-      throw new Exception("Missing employees!");
+      throw new IncompatibleRulesException();
     }
 
     for (GenerateRule rule : generateRules) {
       allEmployees = rule.filterEmployees(stationId, allEmployees);
     }
 
-    int idx = (int) (Math.random() * (allEmployees.size() - 0)) + 0;
-    return allEmployees.get(idx);
+    try {
+      int idx = (int) (Math.random() * (allEmployees.size() - 0)) + 0;
+      return allEmployees.get(idx);
+    } catch (IndexOutOfBoundsException e) {
+      throw new IncompatibleRulesException();
+    }
   }
 
   /**
    * Generate programs for one month.
    *
    * @param monthDay the month day
+   * @throws IncompatibleRulesException the incompatible rules exception
    */
-  public void generateProgramsForOneMonth(Date monthDay) {
+  public void generateProgramsForOneMonth(Date monthDay) throws IncompatibleRulesException {
     List<Date> datesOfMonth = getAllDaysFromMonth(monthDay);
     if (datesOfMonth == null || datesOfMonth.size() == 0) {
       System.out.println("Missing month dates!");
@@ -174,8 +221,43 @@ public class ProgramService {
     for (Date date : datesOfMonth) {
       programRepository.deleteByDate(date);
     }
+
+    List<StationModel> allStations = stationService.findAll();
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
+    List<ProgramEntity> programsForMonth = new ArrayList<>();
+    long generateStartMillis = System.currentTimeMillis();
     for (Date date : datesOfMonth) {
-      generateProgramsForOneDay(date);
+      List<ProgramEntity> programsForDay = null;
+      while (programsForDay == null) {
+        programsForDay = getProgramsForOneDay(date, allStations, copyEmployeeList(allEmployees));
+        if ((System.currentTimeMillis() - generateStartMillis) > 30 * 60 * 1000) {
+          throw new IncompatibleRulesException();
+        }
+      }
+      addEmployeeWorkingHoursFromPrograms(allEmployees, programsForDay);
+      programsForMonth.addAll(programsForDay);
+    }
+
+    programRepository.save(programsForMonth);
+  }
+
+  /**
+   * Adds the employee working hours from programs.
+   *
+   * @param employees the employees
+   * @param programs the programs
+   */
+  private void addEmployeeWorkingHoursFromPrograms(List<EmployeeStatusModel> employees, List<ProgramEntity> programs) {
+    if (employees == null || programs == null) {
+      return;
+    }
+
+    for (ProgramEntity program : programs) {
+      for (EmployeeStatusModel employee : employees) {
+        if (employee.getId() == program.getEmployee().getId()) {
+          employee.setWorkedHours(employee.getWorkedHours() + program.getWorkedHours());
+        }
+      }
     }
   }
 
