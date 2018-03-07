@@ -100,7 +100,7 @@ public class ProgramService {
     List<ProgramEntity> programsForDay = null;
     for (long generateStartMillis = System.currentTimeMillis(); programsForDay == null;) {
       programsForDay = getProgramsForOneDay(dayOfProgram, allStations, copyEmployeeList(allEmployees));
-      if ((System.currentTimeMillis() - generateStartMillis) > 60 * 1000) {
+      if ((System.currentTimeMillis() - generateStartMillis) > 10 * 1000) {
         throw new IncompatibleRulesException();
       }
     }
@@ -230,7 +230,7 @@ public class ProgramService {
       List<ProgramEntity> programsForDay = null;
       while (programsForDay == null) {
         programsForDay = getProgramsForOneDay(date, allStations, copyEmployeeList(allEmployees));
-        if ((System.currentTimeMillis() - generateStartMillis) > 30 * 60 * 1000) {
+        if ((System.currentTimeMillis() - generateStartMillis) > 30 * 10 * 1000) {
           throw new IncompatibleRulesException();
         }
       }

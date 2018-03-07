@@ -308,7 +308,8 @@ function generatePrograms() {
 			url: "programMonth?dayOfProgram=" + getDateFromDisplay(date),
 			method: "PUT",
             error: generateProgramsErrorHandler,
-            beforeSend: generateProgramsErrorBeforeSend
+            beforeSend: generateProgramsErrorBeforeSend,
+            complete: generateProgramsErrorComplete
 		});
 	}
 	if ($('#day-programs').is(":visible")) {
@@ -317,7 +318,8 @@ function generatePrograms() {
 			url: "programDay?dayOfProgram=" + date,
 			method: "PUT",
             error: generateProgramsErrorHandler,
-            beforeSend: generateProgramsErrorBeforeSend
+            beforeSend: generateProgramsErrorBeforeSend,
+            complete: generateProgramsErrorComplete
 		}).done(function() {
 			navigateDayPrograms(0);
 		});
@@ -334,7 +336,11 @@ function generateProgramsErrorHandler(request) {
 }
 
 function generateProgramsErrorBeforeSend() {
-	$('body').append('<div></div>');
+	$('body').append('<div class="loading"></div>');
+}
+
+function generateProgramsErrorComplete() {
+	$('.loading').remove();
 }
 
 function formatDate(date) {
