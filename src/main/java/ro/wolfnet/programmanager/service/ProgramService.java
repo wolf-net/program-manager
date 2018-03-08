@@ -1,11 +1,25 @@
 package ro.wolfnet.programmanager.service;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblBorders;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -282,6 +296,61 @@ public class ProgramService {
       calendar.add(Calendar.DAY_OF_MONTH, 1);
     }
     return dates;
+  }
+
+  /**
+   * Export program for one month.
+   *
+   * @param dayOfProgram the day of program
+   * @return the input stream
+   * @throws Exception the exception
+   */
+  public InputStream exportProgramForOneMonth(Date dayOfProgram) throws Exception {
+    XWPFDocument document = new XWPFDocument();
+    XWPFTable table = document.createTable();
+
+    CTBody body = document.getDocument().getBody();
+    if (!body.isSetSectPr()) {
+      body.addNewSectPr();
+    }
+    CTSectPr section = body.getSectPr();
+    if (!section.isSetPgSz()) {
+      section.addNewPgSz();
+    }
+    CTPageSz pageSize = section.getPgSz();
+    pageSize.setOrient(STPageOrientation.LANDSCAPE);
+    pageSize.setW(BigInteger.valueOf(16840));
+    pageSize.setH(BigInteger.valueOf(11900));
+
+    CTTblPr tblpro = table.getCTTbl().getTblPr();
+    CTTblBorders borders = tblpro.addNewTblBorders();
+    borders.addNewBottom().setVal(STBorder.SINGLE);
+    borders.addNewLeft().setVal(STBorder.SINGLE);
+    borders.addNewRight().setVal(STBorder.SINGLE);
+    borders.addNewTop().setVal(STBorder.SINGLE);
+    borders.addNewInsideH().setVal(STBorder.SINGLE);
+    borders.addNewInsideV().setVal(STBorder.SINGLE);
+
+    XWPFTableRow tableRowOne = table.getRow(0);
+    tableRowOne.getCell(0).setText("col one, row one");
+    tableRowOne.addNewTableCell().setText("col two, row one");
+    tableRowOne.addNewTableCell().setText("col three, row one");
+
+    XWPFTableRow tableRowTwo = table.createRow();
+    tableRowTwo.getCell(0).setText("col one, row two");
+    tableRowTwo.getCell(1).setText("col two, row two");
+    tableRowTwo.getCell(2).setText("col three, row two");
+
+    XWPFTableRow tableRowThree = table.createRow();
+    tableRowThree.getCell(0).setText("col one, row three");
+    tableRowThree.getCell(1).setText("col two, row three");
+    tableRowThree.getCell(2).setText("col three, row three");
+
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    document.write(baos);
+    document.close();
+
+    return new ByteArrayInputStream(baos.toByteArray());
   }
 
 }

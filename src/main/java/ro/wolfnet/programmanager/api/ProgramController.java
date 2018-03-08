@@ -1,8 +1,12 @@
 package ro.wolfnet.programmanager.api;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.poi.util.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -32,14 +36,15 @@ public class ProgramController {
   /**
    * Gets the programs.
    *
+   * @param dayOfProgram the day of program
    * @return the programs
    */
   @RequestMapping(value = "/programDay", method = RequestMethod.GET)
-  public ResponseEntity<List<ProgramModel>> getPrograms(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
+  public ResponseEntity<List<ProgramModel>> getPrograms(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayOfProgram) {
     List<ProgramModel> programs = programService.findAllForOneDay(dayOfProgram);
     return new ResponseEntity<List<ProgramModel>>(programs, HttpStatus.OK);
   }
-  
+
   /**
    * Generate program for one day.
    *
@@ -47,15 +52,15 @@ public class ProgramController {
    * @return the response entity
    */
   @RequestMapping(value = "/programDay", method = RequestMethod.PUT)
-  public ResponseEntity<Void> generateProgramsForOneDay(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
+  public ResponseEntity<Void> generateProgramsForOneDay(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayOfProgram) {
     try {
       programService.generateProgramsForOneDay(dayOfProgram);
       return new ResponseEntity<Void>(HttpStatus.OK);
-    }catch (IncompatibleRulesException e) {
+    } catch (IncompatibleRulesException e) {
       return new ResponseEntity<>(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS);
     }
   }
-  
+
   /**
    * Generate programs for one month.
    *
@@ -63,13 +68,27 @@ public class ProgramController {
    * @return the response entity
    */
   @RequestMapping(value = "/programMonth", method = RequestMethod.PUT)
-  public ResponseEntity<Void> generateProgramsForOneMonth(@RequestParam @DateTimeFormat(pattern="yyyy-MM-dd") Date dayOfProgram) {
+  public ResponseEntity<Void> generateProgramsForOneMonth(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayOfProgram) {
     try {
       programService.generateProgramsForOneMonth(dayOfProgram);
       return new ResponseEntity<Void>(HttpStatus.OK);
-    }catch (IncompatibleRulesException e) {
+    } catch (IncompatibleRulesException e) {
       return new ResponseEntity<>(HttpStatus.UNAVAILABLE_FOR_LEGAL_REASONS);
     }
+  }
+
+  /**
+   * Export programs for one month.
+   *
+   * @param dayOfProgram the day of program
+   * @param response the response
+   */
+  @RequestMapping(value = "/generateProgramMonth", method = RequestMethod.GET)
+  public void exportProgramsForOneMonth(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayOfProgram,
+                                        HttpServletResponse response) throws Exception {
+    InputStream is = programService.exportProgramForOneMonth(dayOfProgram);
+    IOUtils.copy(is, response.getOutputStream());
+    response.flushBuffer();
   }
 
 }

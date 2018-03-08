@@ -312,7 +312,7 @@ function generatePrograms() {
             complete: generateProgramsErrorComplete
 		});
 	}
-	if ($('#day-programs').is(":visible")) {
+	else if ($('#day-programs').is(":visible")) {
 		var date = $('#day-programs #calendar-curr-date').val();
 		$.ajax({
 			url: "programDay?dayOfProgram=" + date,
@@ -324,6 +324,32 @@ function generatePrograms() {
 			navigateDayPrograms(0);
 		});
 	}
+}
+
+function exportPrograms() {
+	if ($('#calendar-programs').is(":visible")) {
+		var date = $('#calendar-programs .calendar-curr-month').html();
+		saveFile('generateProgramMonth?dayOfProgram=' + getDateFromDisplay(date));
+	}
+	else if ($('#day-programs').is(":visible")) {
+		alert('not implemented');
+	}
+}
+
+function saveFile(url) {
+	var xhr = new XMLHttpRequest();
+	xhr.responseType = 'blob';
+	xhr.onload = function() {
+	    var a = document.createElement('a');
+		a.href = window.URL.createObjectURL(xhr.response);
+		a.download = 'plan_' + new Date().getTime() + '.docx';
+		a.style.display = 'none';
+	    document.body.appendChild(a);
+	    a.click();
+	    delete a;
+	};
+	xhr.open('GET', url);
+	xhr.send();
 }
 
 function generateProgramsErrorHandler(request) {
