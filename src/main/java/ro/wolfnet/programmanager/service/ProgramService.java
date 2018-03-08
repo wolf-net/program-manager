@@ -10,20 +10,27 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblBorders;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import ro.wolfnet.programmanager.entity.ProgramEntity;
+import ro.wolfnet.programmanager.model.EmployeeModel;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
 import ro.wolfnet.programmanager.model.StationModel;
@@ -330,27 +337,76 @@ public class ProgramService {
     borders.addNewTop().setVal(STBorder.SINGLE);
     borders.addNewInsideH().setVal(STBorder.SINGLE);
     borders.addNewInsideV().setVal(STBorder.SINGLE);
+    CTTblWidth tblW = tblpro.getTblW();
+    tblW.setW(BigInteger.valueOf(5000));
+    tblW.setType(STTblWidth.PCT);
 
-    XWPFTableRow tableRowOne = table.getRow(0);
-    tableRowOne.getCell(0).setText("col one, row one");
-    tableRowOne.addNewTableCell().setText("col two, row one");
-    tableRowOne.addNewTableCell().setText("col three, row one");
-
-    XWPFTableRow tableRowTwo = table.createRow();
-    tableRowTwo.getCell(0).setText("col one, row two");
-    tableRowTwo.getCell(1).setText("col two, row two");
-    tableRowTwo.getCell(2).setText("col three, row two");
-
-    XWPFTableRow tableRowThree = table.createRow();
-    tableRowThree.getCell(0).setText("col one, row three");
-    tableRowThree.getCell(1).setText("col two, row three");
-    tableRowThree.getCell(2).setText("col three, row three");
+    addProgramsOfMonthToTable(dayOfProgram, table);
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     document.write(baos);
     document.close();
 
     return new ByteArrayInputStream(baos.toByteArray());
+  }
+
+  /**
+   * Adds the programs of month to table.
+   *
+   * @param dayOfProgram the day of program
+   * @param table the table
+   */
+  private void addProgramsOfMonthToTable(Date dayOfProgram, XWPFTable table) {
+    XWPFTableRow row = table.createRow();
+    row.getCell(0).setText("");
+
+    List<EmployeeModel> employees = employeeService.findAll();
+    for (EmployeeModel employee : employees) {
+      row = table.createRow();
+      row.getCell(0).setText(employee.getName());
+    }
+
+    List<Date> dates = getAllDaysFromMonth(dayOfProgram);
+    for (Date date : dates) {
+      row = table.getRows().get(1);
+      addTextToCell(row.addNewTableCell(), getDayFromDate(date));
+
+      List<ProgramEntity> programs = programRepository.findAllByDate(date);
+      for (int i = 0; i < employees.size(); i++) {
+        row = table.getRows().get(i + 2);
+        int idx = programs.indexOf(new ProgramEntity(employeeService.getEntityFromModel(employees.get(i))));
+        String text = "";
+        if (idx > -1) {
+          text = programs.get(idx).getStation().getName();
+        }
+        addTextToCell(row.addNewTableCell(), text);
+      }
+    }
+  }
+
+  /**
+   * Adds the text to cell.
+   *
+   * @param cell the cell
+   * @param text the text
+   */
+  private void addTextToCell(XWPFTableCell cell, String text) {
+    XWPFParagraph tempParagraph = cell.getParagraphs().get(0);
+    tempParagraph.setAlignment(ParagraphAlignment.CENTER);
+    XWPFRun tempRun = tempParagraph.createRun();
+    tempRun.setText(text);
+  }
+
+  /**
+   * Gets the day from date.
+   *
+   * @param date the date
+   * @return the day from date
+   */
+  private String getDayFromDate(Date date) {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    return cal.get(Calendar.DAY_OF_MONTH) + "";
   }
 
 }

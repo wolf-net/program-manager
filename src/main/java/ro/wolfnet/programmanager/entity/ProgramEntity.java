@@ -2,7 +2,12 @@ package ro.wolfnet.programmanager.entity;
 
 import java.util.Date;
 
-import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 /**
  * The Class ProgramEntity.
@@ -27,6 +32,21 @@ public class ProgramEntity {
 
   /** The worked hours. */
   private int workedHours;
+
+  /**
+   * Instantiates a new program entity.
+   */
+  public ProgramEntity() {
+  }
+
+  /**
+   * Instantiates a new program entity.
+   *
+   * @param employee the employee
+   */
+  public ProgramEntity(EmployeeEntity employee) {
+    this.employee = employee;
+  }
 
   /**
    * Gets the id.
@@ -122,5 +142,40 @@ public class ProgramEntity {
    */
   public void setWorkedHours(int workedHours) {
     this.workedHours = workedHours;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int PRIME = 31;
+    int result = 1;
+    result = PRIME * result;
+    if (employee != null) {
+      result += employee.getId();
+    }
+    return result;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    ProgramEntity entity = (ProgramEntity) obj;
+    if (employee != null && entity.getEmployee() != null && employee.getId() != entity.getEmployee().getId()) {
+      return false;
+    }
+    return true;
   }
 }
