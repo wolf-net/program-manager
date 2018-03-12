@@ -327,13 +327,15 @@ function generatePrograms() {
 }
 
 function exportPrograms() {
+	var date = null;
 	if ($('#calendar-programs').is(":visible")) {
-		var date = $('#calendar-programs .calendar-curr-month').html();
-		saveFile('generateProgramMonth?dayOfProgram=' + getDateFromDisplay(date));
+		date = $('#calendar-programs .calendar-curr-month').html();
 	}
 	else if ($('#day-programs').is(":visible")) {
-		alert('not implemented');
+		date = $('#day-programs .calendar-curr-month').html();
+		date = date.split(' ')[1] + ' ' + date.split(' ')[2];
 	}
+	saveFile('generateProgramMonth?dayOfProgram=' + getDateFromDisplay(date));
 }
 
 function saveFile(url) {

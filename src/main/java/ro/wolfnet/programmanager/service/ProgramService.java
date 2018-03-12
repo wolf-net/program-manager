@@ -8,7 +8,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -360,16 +362,19 @@ public class ProgramService {
     XWPFTableRow row = table.createRow();
     row.getCell(0).setText("");
 
+    Map<Long, Integer> employeeWorkedHours = new HashMap<>();
     List<EmployeeModel> employees = employeeService.findAll();
     for (EmployeeModel employee : employees) {
       row = table.createRow();
+      employeeWorkedHours.put(employee.getId(), 0);
       row.getCell(0).setText(employee.getName());
     }
 
     List<Date> dates = getAllDaysFromMonth(dayOfProgram);
     for (Date date : dates) {
       row = table.getRows().get(1);
-      addTextToCell(row.addNewTableCell(), getDayFromDate(date));
+      boolean weekend = isDayInWeekend(date);
+      addTextToCell(row.addNewTableCell(), getDayFromDate(date), weekend);
 
       List<ProgramEntity> programs = programRepository.findAllByDate(date);
       for (int i = 0; i < employees.size(); i++) {
@@ -377,11 +382,26 @@ public class ProgramService {
         int idx = programs.indexOf(new ProgramEntity(employeeService.getEntityFromModel(employees.get(i))));
         String text = "";
         if (idx > -1) {
-          text = programs.get(idx).getStation().getName();
+        	ProgramEntity programEntity = programs.get(idx);
+        	long employeeId = programEntity.getEmployee().getId();
+        	employeeWorkedHours.put(employeeId, employeeWorkedHours.get(employeeId) + programEntity.getWorkedHours());
+        	text = programEntity.getStation().getName();
         }
-        addTextToCell(row.addNewTableCell(), text);
+        addTextToCell(row.addNewTableCell(), text, weekend);
       }
     }
+    
+    for (int i = 0; i < employees.size(); i ++) {
+    	row = table.getRows().get(i + 2);
+    	int workedHours = employeeWorkedHours.get(employees.get(i).getId());
+        addTextToCell(row.addNewTableCell(), workedHours + "", false);
+    }
+  }
+
+  private boolean isDayInWeekend(Date date) {
+	Calendar cal = Calendar.getInstance();
+	cal.setTime(date);
+	return cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY;
   }
 
   /**
@@ -390,11 +410,14 @@ public class ProgramService {
    * @param cell the cell
    * @param text the text
    */
-  private void addTextToCell(XWPFTableCell cell, String text) {
+  private void addTextToCell(XWPFTableCell cell, String text, boolean greyBackground) {
     XWPFParagraph tempParagraph = cell.getParagraphs().get(0);
     tempParagraph.setAlignment(ParagraphAlignment.CENTER);
     XWPFRun tempRun = tempParagraph.createRun();
     tempRun.setText(text);
+    if (greyBackground) {
+    	cell.setColor("E2E2E2");
+    }
   }
 
   /**
