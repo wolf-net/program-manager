@@ -1,6 +1,7 @@
 package ro.wolfnet.programmanager.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,8 @@ public class EmployeeService {
   /** The program repository. */
   @Autowired
   private ProgramRepository programRepository;
-  
+
+  /** The station service. */
   @Autowired
   private StationService stationService;
 
@@ -174,9 +176,30 @@ public class EmployeeService {
     for (EmployeeModel employee : employees) {
       EmployeeStatusModel employeeStatus = new EmployeeStatusModel(employee);
       employeeStatus.setWorkedHours(getWorkedHoursOfEmployeeFromPrograms(employee, programs));
+      employeeStatus.setLastWorked(getLastWorkedFromPrograms(employee, programs));
       employeeStatuses.add(employeeStatus);
     }
     return employeeStatuses;
+  }
+
+  /**
+   * Gets the last worked from programs.
+   *
+   * @param employee the employee
+   * @param programs the programs
+   * @return the last worked from programs
+   */
+  private Date getLastWorkedFromPrograms(EmployeeModel employee, List<ProgramEntity> programs) {
+    Date min = null;
+    for (ProgramEntity program : programs) {
+      if (program.getEmployee().getId() != employee.getId()) {
+        continue;
+      }
+      if (min == null || min.after(program.getDate())) {
+        min = program.getDate();
+      }
+    }
+    return min;
   }
 
   /**

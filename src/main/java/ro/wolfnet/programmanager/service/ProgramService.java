@@ -257,11 +257,32 @@ public class ProgramService {
           throw new IncompatibleRulesException();
         }
       }
+      addEmployeeLastWorkedFromPrograms(allEmployees, programsForDay);
       addEmployeeWorkingHoursFromPrograms(allEmployees, programsForDay);
       programsForMonth.addAll(programsForDay);
     }
 
     programRepository.save(programsForMonth);
+  }
+
+  /**
+   * Adds the employee last worked from programs.
+   *
+   * @param employees the employees
+   * @param programs the programs
+   */
+  private void addEmployeeLastWorkedFromPrograms(List<EmployeeStatusModel> employees, List<ProgramEntity> programs) {
+    if (employees == null || programs == null) {
+      return;
+    }
+
+    for (ProgramEntity program : programs) {
+      for (EmployeeStatusModel employee : employees) {
+        if (employee.getId() == program.getEmployee().getId()) {
+          employee.setLastWorked(program.getDate());
+        }
+      }
+    }
   }
 
   /**
@@ -382,26 +403,32 @@ public class ProgramService {
         int idx = programs.indexOf(new ProgramEntity(employeeService.getEntityFromModel(employees.get(i))));
         String text = "";
         if (idx > -1) {
-        	ProgramEntity programEntity = programs.get(idx);
-        	long employeeId = programEntity.getEmployee().getId();
-        	employeeWorkedHours.put(employeeId, employeeWorkedHours.get(employeeId) + programEntity.getWorkedHours());
-        	text = programEntity.getStation().getName();
+          ProgramEntity programEntity = programs.get(idx);
+          long employeeId = programEntity.getEmployee().getId();
+          employeeWorkedHours.put(employeeId, employeeWorkedHours.get(employeeId) + programEntity.getWorkedHours());
+          text = programEntity.getStation().getName();
         }
         addTextToCell(row.addNewTableCell(), text, weekend);
       }
     }
-    
-    for (int i = 0; i < employees.size(); i ++) {
-    	row = table.getRows().get(i + 2);
-    	int workedHours = employeeWorkedHours.get(employees.get(i).getId());
-        addTextToCell(row.addNewTableCell(), workedHours + "", false);
+
+    for (int i = 0; i < employees.size(); i++) {
+      row = table.getRows().get(i + 2);
+      int workedHours = employeeWorkedHours.get(employees.get(i).getId());
+      addTextToCell(row.addNewTableCell(), workedHours + "", false);
     }
   }
 
+  /**
+   * Checks if is day in weekend.
+   *
+   * @param date the date
+   * @return true, if is day in weekend
+   */
   private boolean isDayInWeekend(Date date) {
-	Calendar cal = Calendar.getInstance();
-	cal.setTime(date);
-	return cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY;
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(date);
+    return cal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || cal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY;
   }
 
   /**
@@ -409,6 +436,7 @@ public class ProgramService {
    *
    * @param cell the cell
    * @param text the text
+   * @param greyBackground the grey background
    */
   private void addTextToCell(XWPFTableCell cell, String text, boolean greyBackground) {
     XWPFParagraph tempParagraph = cell.getParagraphs().get(0);
@@ -416,7 +444,7 @@ public class ProgramService {
     XWPFRun tempRun = tempParagraph.createRun();
     tempRun.setText(text);
     if (greyBackground) {
-    	cell.setColor("E2E2E2");
+      cell.setColor("E2E2E2");
     }
   }
 
