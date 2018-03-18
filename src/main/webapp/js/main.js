@@ -3,6 +3,7 @@ $(document).ready(function() {
 	loadEmployees();
 	loadStations();
 	loadPrograms();
+	loadRules();
 });
 
 function goToSection(elem, sectionId) {
@@ -410,4 +411,44 @@ function getString(text, defaultText) {
 		return defaultText;
 	}
 	return text;
+}
+
+function loadRules() {
+	ruleTypeChanged();
+	wizardNavigate(0);
+}
+
+function wizardNavigate(position) {
+	$('.wizard-prev').show();
+	$('.wizard-next').show();
+	$('.wizard-save').show();
+
+	var activeIdx = $('.wizard section:visible').index();
+	if (position == 0) {
+		activeIdx = 0;
+	}
+	$('.wizard section').hide();
+	$('.wizard section').eq(activeIdx + position).show();
+	
+	activeIdx = $('.wizard section:visible').index();
+	if (position == 0) {
+		activeIdx = 0;
+	}
+	if (activeIdx == 0) {
+		$('.wizard-prev').hide();
+		$('.wizard-save').hide();
+	}
+	else if ($('.wizard section').length == (activeIdx + 1)) {
+		$('.wizard-next').hide();
+	}else{
+		$('.wizard-save').hide();
+	}
+}
+
+function ruleTypeChanged() {
+	$('.wizard section').not(':eq(0)').remove();
+	var selected = $('#ruleType option:selected').val();
+	if (selected == 'vacation') {
+		//add section to dom
+	}
 }

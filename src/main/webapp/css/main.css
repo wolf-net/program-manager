@@ -226,7 +226,7 @@ input[type='radio'].color.red:checked:after {
     font-size: 70%;
 }
 
-input, textarea, .select2 {
+input, textarea, select, .select2 {
 	margin: 0.25em 0;
 	font-size: 1em;
 	width: 100%;
@@ -732,3 +732,50 @@ p.info {
     background-position: center;
 }
 
+.wizard {
+	padding: 40px;
+}
+
+.wizard .steps,
+.wizard .actions {
+	display: none;
+}
+
+.wizard .content {
+	padding-top: 0;
+}
+
+.wizard-container {
+	background-color: #e0e0d1;
+	display:table;
+	width: 100%;
+}
+
+.wizard-container .wizard-prev,
+.wizard-container .wizard-next,
+.wizard-container .wizard-save,
+.wizard-container .wizard {
+	display:table-cell;
+	vertical-align:middle;
+}
+
+.wizard-container .wizard-prev i,
+.wizard-container .wizard-next i,
+.wizard-container .wizard-save i {
+	position:fixed;
+    font-size: 2em;
+    margin-top: -30px;
+}
+
+.wizard-container .wizard-next i,
+.wizard-container .wizard-save i {
+    margin-left: -30px;
+}
+
+.wizard-container .wizard-prev i {
+    margin-left: -40px;
+}
+
+.wizard option {
+	font-size:0.33em;
+}

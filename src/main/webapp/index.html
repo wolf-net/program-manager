@@ -29,40 +29,6 @@
 							<input type="hidden" id="calendar-curr-date" />
 							<span class="calendar-next" onclick="navigateDayPrograms(+1);">&rsaquo;</span>
 						</section>
-						<div class="day-program">
-					        <div class="station">First station</div>
-							<ol class="employees">
-								<li>First employee</li>
-								<li>Second employee</li>
-								<li class="green">Third employee</li>
-								<li>Fourth employee</li>
-								<li class="red">Fifth employee</li>
-							</ol>
-					    </div>
-						<div class="day-program">
-					        <div class="station">Second station</div>
-							<ol class="employees">
-								<li>First employee</li>
-								<li class="blue">Second employee</li>
-								<li>Third employee</li>
-								<li>Fourth employee</li>
-								<li>Fifth employee</li>
-								<li>Sixth employee</li>
-								<li class="green">Seventh employee</li>
-							</ol>
-					    </div>
-						<div class="day-program">
-					        <div class="station">Third station</div>
-							<ol class="employees">
-								<li>First employee</li>
-								<li>Second employee</li>
-								<li>Third employee</li>
-								<li>Fourth employee</li>
-								<li class="red">Fifth employee</li>
-								<li>Sixth employee</li>
-								<li>Seventh employee</li>
-							</ol>
-					    </div>
 					</div>
 					<table id="calendar-programs" class="calendar"></table>
 					<div class="page-buttons two-buttons">
@@ -71,7 +37,20 @@
 					</div>
 				</section>
 				<section id="section-2" class="tab-section">
-					Generate rules ...
+					<div class="wizard-container">
+						<div class="wizard-prev" onclick="wizardNavigate(-1);"><i class="fa fa-chevron-circle-left"></i></div>
+						<div class="wizard">
+						    <section>
+						    	<h3>Rule type</h3>
+						        <select id="ruleType" onchange="ruleTypeChanged();">
+								  <option value="vacation">Vacation</option>
+								  <option value="together">Work together</option>
+								</select>
+						    </section>
+						</div>
+						<div class="wizard-next" onclick="wizardNavigate(1);"><i class="fa fa-chevron-circle-right"></i></div>
+						<div class="wizard-save"><i class="fa fa-save"></i></div>
+					</div>
 				</section>
 				<section id="section-3" class="tab-section">
 					<div class="cards-list-container">
