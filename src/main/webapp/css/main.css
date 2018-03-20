@@ -748,7 +748,8 @@ p.info {
 .wizard-container {
 	background-color: #e0e0d1;
 	display:table;
-	width: 100%;
+	width: 95%;
+	margin: 0 auto;
 }
 
 .wizard-container .wizard-prev,
@@ -778,4 +779,16 @@ p.info {
 
 .wizard option {
 	font-size:0.33em;
+}
+
+.select2-container .select2-selection--single {
+	height: 1.4em;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+	line-height: 1.2em;
+}
+
+.select2-search__field {
+	font-size: 2em;
 }

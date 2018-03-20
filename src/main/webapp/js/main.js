@@ -1,9 +1,9 @@
 $(document).ready(function() {
 	$('nav li:eq(0) i').trigger('onclick');
-	loadEmployees();
-	loadStations();
 	loadPrograms();
 	loadRules();
+	loadEmployees();
+	loadStations();
 });
 
 function goToSection(elem, sectionId) {
@@ -73,7 +73,7 @@ function editEmployee(editButton) {
 		'  </div>' +
 		'</div>';
 	$(editButton).parents('.card').replaceWith(cardContent);
-	initializeEmployeeStationInput($('#edit-employee_' + employeeId + ' [name="station-input"]'));
+	initializeStationInput($('#edit-employee_' + employeeId + ' [name="station-input"]'));
 }
 
 function loadEmployees() {
@@ -121,11 +121,11 @@ function loadEmployees() {
 			'</div>';
 		$('#section-3 .cards-list-container').append(cardContent);
 		
-		initializeEmployeeStationInput($('#new-employee [name="station-input"]'));
+		initializeStationInput($('#new-employee [name="station-input"]'));
 	});
 }
 
-function initializeEmployeeStationInput(jInput) {
+function initializeStationInput(jInput) {
 	$.ajax({
 		method: "GET",
 		url: "station"
@@ -142,15 +142,41 @@ function initializeEmployeeStationInput(jInput) {
 			data: results
 		});
 		
-		jInput.next('.select2').css('width', '');
-		jInput.next('.select2').find('.select2-search__field').css('width', '');
-		if (jInput.attr('value') != undefined) {
-			var stationIds = $.map(jInput.attr('value').split(','), function(val, i) {
-				return parseInt(val);
-			});
-			jInput.select2('val', [stationIds]);
-		}
+		designSelect2Input(jInput);
 	});
+}
+
+function initializeEmployeeInput(jInput) {
+	$.ajax({
+		method: "GET",
+		url: "employee"
+	}).done(function(response) {
+		results = $.map(response, function(employee) {
+			return {
+			  "id": employee.id,
+			  "text": employee.name
+			};
+		});
+		
+		jInput.select2({
+			placeholder: "Employee",
+			data: results
+		});
+		
+		designSelect2Input(jInput);
+	});
+}
+
+function designSelect2Input(jInput) {
+	jInput.next('.select2').css('width', '');
+	jInput.next('.select2').find('.select2-search__field').css('width', '');
+	if (jInput.attr('value') != undefined) {
+		var stationIds = $.map(jInput.attr('value').split(','), function(val, i) {
+			return parseInt(val);
+		});
+		jInput.select2('val', [stationIds]);
+	}
+	
 }
 
 function saveSettings() {
@@ -436,9 +462,8 @@ function wizardNavigate(position) {
 	}
 	if (activeIdx == 0) {
 		$('.wizard-prev').hide();
-		$('.wizard-save').hide();
 	}
-	else if ($('.wizard section').length == (activeIdx + 1)) {
+	if ($('.wizard section').length == (activeIdx + 1)) {
 		$('.wizard-next').hide();
 	}else{
 		$('.wizard-save').hide();
@@ -449,6 +474,56 @@ function ruleTypeChanged() {
 	$('.wizard section').not(':eq(0)').remove();
 	var selected = $('#ruleType option:selected').val();
 	if (selected == 'vacation') {
-		//add section to dom
+		$('.wizard').append(
+			'<section style="display: none;">' +
+			'<form id="ruleForm">' +
+			'<input name="ruleType" type="hidden" value="1" />' +
+		    '<h3>Vacation</h3>' +
+		    'Start date:' +
+		    '<input name="vacationStartDate" type="date">' +
+		    'End date:' +
+		    '<input name="vacationEndDate" type="date">' +
+		    'Employee:' +
+		    '<select name="vacationForEmployee" />' +
+		    '</form>' +
+		    '</section>');
+
+		initializeEmployeeInput($('.wizard [name="vacationForEmployee"]'));
 	}
+	else if (selected == 'together') {
+		$('.wizard').append(
+			'<section style="display: none;">' +
+		    '<h3>Work together</h3>' +
+		    '</section>');
+	}
+}
+
+function saveRule() {
+	var data = {};
+	$('#ruleForm').find('input').each(function(idx, input) {
+		var jInput = $(input);
+		data[jInput.attr('name')] = jInput.val();
+	});
+
+	$.ajax({
+		url: "rule",
+		method: "PUT",
+		dataType: "jsonp",
+        contentType: "application/json",
+		data: JSON.stringify(data),
+        error: saveRuleErrorHandler,
+        complete: saveRuleCompleteHandler
+	});
+}
+
+function saveRuleErrorHandler(request) {
+	if (request.status = 417) {
+		alert('Invalid data! Correct values!');
+	}
+	else {
+		alert('General error! Try again!');
+	}
+}
+
+function saveRuleCompleteHandler() {
 }

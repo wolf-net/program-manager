@@ -43,13 +43,13 @@
 						    <section>
 						    	<h3>Rule type</h3>
 						        <select id="ruleType" onchange="ruleTypeChanged();">
-								  <option value="vacation">Vacation</option>
+								  <option value="vacation" selected="selected">Vacation</option>
 								  <option value="together">Work together</option>
 								</select>
 						    </section>
 						</div>
 						<div class="wizard-next" onclick="wizardNavigate(1);"><i class="fa fa-chevron-circle-right"></i></div>
-						<div class="wizard-save"><i class="fa fa-save"></i></div>
+						<div class="wizard-save" onClick="saveRule();"><i class="fa fa-save"></i></div>
 					</div>
 				</section>
 				<section id="section-3" class="tab-section">
