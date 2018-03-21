@@ -792,3 +792,19 @@ p.info {
 .select2-search__field {
 	font-size: 2em;
 }
+
+#section-2 .card-content .name-display {
+	text-align: left;
+}
+
+.card.vacation {
+    background-color: #C1FFFF;
+}
+
+.card.vacation:before {
+    font-family: FontAwesome;
+    font-size: 3.5em;
+    content: "\f0e9";
+    display: table-cell;
+    padding: 20px 0 0 20px;
+}

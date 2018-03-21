@@ -1,8 +1,10 @@
 package ro.wolfnet.programmanager.service.generate;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 
 /**
@@ -17,7 +19,7 @@ public class AssignedStationsRule implements GenerateRule {
    * @see ro.wolfnet.programmanager.service.generate.GenerateRule#filterEmployees(java.util.List)
    */
   @Override
-  public List<EmployeeStatusModel> filterEmployees(long stationId, List<EmployeeStatusModel> employees) {
+  public List<EmployeeStatusModel> filterEmployees(long stationId, Date date, List<EmployeeStatusModel> employees, List<RuleBaseEntity> rules) {
     if (employees == null) {
       return null;
     }

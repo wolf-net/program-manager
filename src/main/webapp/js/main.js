@@ -444,10 +444,35 @@ function loadRules() {
 		method: "GET",
 		url: "rule"
 	}).done(function(response) {
-		console.log(response);
+		$('#section-2 .cards-list-container').remove();
+		$('#section-2').prepend('<div class="cards-list-container"></div>');
+		
+		$(response).each(function(index, element) {
+			$('#section-2 .cards-list-container').append(
+				'<div class="card vacation">' +  
+					'<div class="card-content">' + 
+						'<input type="hidden" id="ruleId" value="' + element.ruleId + '" />' +
+						'<div class="name-display">' + element.employeeName + '</div>' +
+						'<div class="interval-display">' + formatDate(new Date(element.startDate)) + ' - ' + formatDate(new Date(element.endDate)) + '</div>' +   
+					'</div>' +
+					'<div class="card-buttons">' +
+						'<i class="fa fa-trash-o" onclick="deleteRule(this);"></i>' + 
+					'</div>' +
+				'</div>');
+		});
 	});
 	ruleTypeChanged();
 	wizardNavigate(0);
+}
+
+function deleteRule(button) {
+	var ruleId = $(button).parents(".card.vacation").find("#ruleId").val();
+	$.ajax({
+		url: "rule?ruleId=" + ruleId,
+		method: "DELETE"
+	}).always(function() {
+		loadRules();
+	});
 }
 
 function wizardNavigate(position) {

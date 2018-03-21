@@ -51,8 +51,14 @@ public class RuleController {
    */
   @RequestMapping(value = "/rule", method = RequestMethod.GET)
   public ResponseEntity<List<RuleModel>> getRules() {
-    List<RuleModel> rules = ruleService.findRules();
+    List<RuleModel> rules = ruleService.findRuleModels();
     return new ResponseEntity<List<RuleModel>>(rules, HttpStatus.OK);
+  }
+
+  @RequestMapping(value = "/rule", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> deleteEmployee(long ruleId) {
+	ruleService.deleteById(ruleId);
+    return new ResponseEntity<Void>(HttpStatus.OK);
   }
 
 }

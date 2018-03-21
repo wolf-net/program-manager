@@ -57,7 +57,7 @@ public class RuleService {
    *
    * @return the list
    */
-  public List<RuleModel> findRules() {
+  public List<RuleModel> findRuleModels() {
     List<RuleModel> rules = new ArrayList<>();
     for (RuleBaseEntity rule : ruleRepository.findAll()) {
       rules.add(getRuleModelFromEntity(rule));
@@ -89,11 +89,24 @@ public class RuleService {
    */
   private RuleModel getRuleModelFromVacationEntity(RuleVacationEntity rule) {
     RuleModel model = new RuleModel();
-    model.setEmployee(rule.getEmployees().iterator().next().getId());
+    EmployeeEntity employee = rule.getEmployees().iterator().next();
+    model.setRuleId(rule.getId());
+    model.setEmployee(employee.getId());
+    model.setEmployeeName(employee.getName());
     model.setEndDate(rule.getEnd());
     model.setStartDate(rule.getStart());
     model.setRuleType(RuleModel.RULE_TYPE_VACATION);
     return model;
+  }
+
+  public void deleteById(long ruleId) {
+	RuleVacationEntity entity = new RuleVacationEntity();
+	entity.setId(ruleId);
+	ruleRepository.delete(entity);
+  }
+
+  public List<RuleBaseEntity> findRuleEntities() {
+	return ruleRepository.findAll();
   }
 
 }
