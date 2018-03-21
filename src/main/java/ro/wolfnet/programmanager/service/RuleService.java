@@ -109,4 +109,14 @@ public class RuleService {
 	return ruleRepository.findAll();
   }
 
+  public List<RuleVacationEntity> filterVacationFromBaseRules(List<RuleBaseEntity> rules) {
+	List<RuleVacationEntity> vacationRules = new ArrayList<>();
+	for (RuleBaseEntity rule:rules) {
+		if (rule instanceof RuleVacationEntity) {
+			vacationRules.add((RuleVacationEntity) rule);
+		}
+	}
+	return vacationRules;
+  }
+
 }
