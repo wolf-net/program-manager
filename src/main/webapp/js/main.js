@@ -440,6 +440,12 @@ function getString(text, defaultText) {
 }
 
 function loadRules() {
+	$.ajax({
+		method: "GET",
+		url: "rule"
+	}).done(function(response) {
+		console.log(response);
+	});
 	ruleTypeChanged();
 	wizardNavigate(0);
 }
@@ -480,15 +486,15 @@ function ruleTypeChanged() {
 			'<input name="ruleType" type="hidden" value="1" />' +
 		    '<h3>Vacation</h3>' +
 		    'Start date:' +
-		    '<input name="vacationStartDate" type="date">' +
+		    '<input name="startDate" type="date">' +
 		    'End date:' +
-		    '<input name="vacationEndDate" type="date">' +
+		    '<input name="endDate" type="date">' +
 		    'Employee:' +
-		    '<select name="vacationForEmployee" />' +
+		    '<input name="employee" />' +
 		    '</form>' +
 		    '</section>');
 
-		initializeEmployeeInput($('.wizard [name="vacationForEmployee"]'));
+		initializeEmployeeInput($('.wizard [name="employee"]'));
 	}
 	else if (selected == 'together') {
 		$('.wizard').append(
@@ -503,27 +509,23 @@ function saveRule() {
 	$('#ruleForm').find('input').each(function(idx, input) {
 		var jInput = $(input);
 		data[jInput.attr('name')] = jInput.val();
-	});
+	})
 
 	$.ajax({
 		url: "rule",
 		method: "PUT",
-		dataType: "jsonp",
         contentType: "application/json",
 		data: JSON.stringify(data),
         error: saveRuleErrorHandler,
-        complete: saveRuleCompleteHandler
+        success: loadRules
 	});
 }
 
 function saveRuleErrorHandler(request) {
-	if (request.status = 417) {
+	if (request.status == 417) {
 		alert('Invalid data! Correct values!');
 	}
 	else {
 		alert('General error! Try again!');
 	}
-}
-
-function saveRuleCompleteHandler() {
 }

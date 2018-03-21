@@ -43,6 +43,9 @@ public class EmployeeEntity {
   /** The stations. */
   private Set<StationEntity> stations;
 
+  /** The vacations. */
+  private Set<RuleBaseEntity> rules;
+
   /**
    * Gets the id.
    *
@@ -172,6 +175,25 @@ public class EmployeeEntity {
    */
   public void setStations(Set<StationEntity> stations) {
     this.stations = stations;
+  }
+
+  /**
+   * Gets the vacations.
+   *
+   * @return the vacations
+   */
+  @ManyToMany(mappedBy = "employees", cascade = CascadeType.ALL)
+  public Set<RuleBaseEntity> getRules() {
+    return rules;
+  }
+
+  /**
+   * Sets the vacations.
+   *
+   * @param vacations the new vacations
+   */
+  public void setRules(Set<RuleBaseEntity> rules) {
+    this.rules = rules;
   }
 
 }
