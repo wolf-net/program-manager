@@ -99,24 +99,43 @@ public class RuleService {
     return model;
   }
 
+  /**
+   * Delete by id.
+   *
+   * @param ruleId the rule id
+   */
   public void deleteById(long ruleId) {
-	RuleVacationEntity entity = new RuleVacationEntity();
-	entity.setId(ruleId);
-	ruleRepository.delete(entity);
+    RuleVacationEntity entity = new RuleVacationEntity();
+    entity.setId(ruleId);
+    ruleRepository.delete(entity);
   }
 
+  /**
+   * Find rule entities.
+   *
+   * @return the list
+   */
   public List<RuleBaseEntity> findRuleEntities() {
-	return ruleRepository.findAll();
+    return ruleRepository.findAll();
   }
 
-  public List<RuleVacationEntity> filterVacationFromBaseRules(List<RuleBaseEntity> rules) {
-	List<RuleVacationEntity> vacationRules = new ArrayList<>();
-	for (RuleBaseEntity rule:rules) {
-		if (rule instanceof RuleVacationEntity) {
-			vacationRules.add((RuleVacationEntity) rule);
-		}
-	}
-	return vacationRules;
+  /**
+   * Filter vacation from base rules.
+   *
+   * @param rules the rules
+   * @return the list
+   */
+  public static List<RuleVacationEntity> filterVacationFromBaseRules(List<RuleBaseEntity> rules) {
+    if (rules == null || rules.size() == 0) {
+      return null;
+    }
+    List<RuleVacationEntity> vacationRules = new ArrayList<>();
+    for (RuleBaseEntity rule : rules) {
+      if (rule instanceof RuleVacationEntity) {
+        vacationRules.add((RuleVacationEntity) rule);
+      }
+    }
+    return vacationRules;
   }
 
 }
