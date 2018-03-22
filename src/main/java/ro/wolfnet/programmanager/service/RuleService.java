@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.entity.RuleVacationEntity;
 import ro.wolfnet.programmanager.model.RuleModel;
 import ro.wolfnet.programmanager.repository.RuleRepository;
+import ro.wolfnet.programmanager.utils.Utils;
 
 /**
  * The Class RuleService.
@@ -136,6 +138,16 @@ public class RuleService {
       }
     }
     return vacationRules;
+  }
+
+  public int getEmployeeVacationHours(long employeeId, List<RuleVacationEntity> vacations) {
+	int vacationHours = 0;
+	for (RuleVacationEntity vacation:vacations) {
+		if (vacation.getEmployees().iterator().next().getId() == employeeId) {
+			vacationHours += Utils.getDateDifference(vacation.getStart(), vacation.getEnd(), TimeUnit.HOURS);
+		}
+	}
+	return vacationHours;
   }
 
 }

@@ -1,5 +1,8 @@
 package ro.wolfnet.programmanager.utils;
 
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
+
 /**
  * The Class Utils.
  *
@@ -31,6 +34,11 @@ public class Utils {
    */
   public static Boolean isNullOrEmpty(String s) {
     return (s == null || s.trim().length() < 1) ? true : false;
+  }
+
+  public static long getDateDifference(Date start, Date end, TimeUnit timeUnit) {
+	long diffInMillies = end.getTime() - start.getTime();
+	return timeUnit.convert(diffInMillies,TimeUnit.MILLISECONDS);
   }
 
 }

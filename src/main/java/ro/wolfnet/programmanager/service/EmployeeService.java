@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.ProgramEntity;
+import ro.wolfnet.programmanager.entity.RuleBaseEntity;
+import ro.wolfnet.programmanager.entity.RuleVacationEntity;
 import ro.wolfnet.programmanager.model.EmployeeModel;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.repository.EmployeeRepository;
@@ -34,6 +36,9 @@ public class EmployeeService {
   /** The station service. */
   @Autowired
   private StationService stationService;
+  
+  @Autowired
+  private RuleService ruleService;
 
   /**
    * Find all.
@@ -169,13 +174,15 @@ public class EmployeeService {
    *
    * @return the list
    */
-  public List<EmployeeStatusModel> findEmployeeStatuses() {
+  public List<EmployeeStatusModel> findEmployeeStatuses(List<RuleBaseEntity> rules) {
     List<EmployeeModel> employees = this.findAll();
     List<ProgramEntity> programs = programRepository.findAll();
+    List<RuleVacationEntity> vacations = RuleService.filterVacationFromBaseRules(rules);
     List<EmployeeStatusModel> employeeStatuses = new ArrayList<>();
     for (EmployeeModel employee : employees) {
       EmployeeStatusModel employeeStatus = new EmployeeStatusModel(employee);
       employeeStatus.setWorkedHours(getWorkedHoursOfEmployeeFromPrograms(employee, programs));
+      employeeStatus.setWorkedHours(employeeStatus.getWorkedHours() + ruleService.getEmployeeVacationHours(employee.getId(), vacations));
       employeeStatus.setLastWorked(getLastWorkedFromPrograms(employee, programs));
       employeeStatuses.add(employeeStatus);
     }

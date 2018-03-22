@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import ro.wolfnet.programmanager.entity.ProgramEntity;
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
+import ro.wolfnet.programmanager.entity.RuleVacationEntity;
 import ro.wolfnet.programmanager.model.EmployeeModel;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
@@ -125,7 +126,7 @@ public class ProgramService {
 
     List<StationModel> allStations = stationService.findAll();
     List<RuleBaseEntity> rules = ruleService.findRuleEntities();
-    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses(rules);
     List<ProgramEntity> programsForDay = null;
     for (long generateStartMillis = System.currentTimeMillis(); programsForDay == null;) {
       programsForDay = getProgramsForOneDay(dayOfProgram, allStations, copyEmployeeList(allEmployees), rules);
@@ -253,7 +254,7 @@ public class ProgramService {
 
     List<StationModel> allStations = stationService.findAll();
     List<RuleBaseEntity> rules = ruleService.findRuleEntities();
-    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses(rules);
     List<ProgramEntity> programsForMonth = new ArrayList<>();
     long generateStartMillis = System.currentTimeMillis();
     for (Date date : datesOfMonth) {
@@ -398,6 +399,8 @@ public class ProgramService {
       row.getCell(0).setText(employee.getName());
     }
 
+    List<RuleBaseEntity> rules = ruleService.findRuleEntities();
+    List<RuleVacationEntity> vacations = RuleService.filterVacationFromBaseRules(rules);
     List<Date> dates = getAllDaysFromMonth(dayOfProgram);
     for (Date date : dates) {
       row = table.getRows().get(1);
@@ -411,9 +414,12 @@ public class ProgramService {
         String text = "";
         if (idx > -1) {
           ProgramEntity programEntity = programs.get(idx);
-          long employeeId = programEntity.getEmployee().getId();
-          employeeWorkedHours.put(employeeId, employeeWorkedHours.get(employeeId) + programEntity.getWorkedHours());
+          long foundEmployeeId = programEntity.getEmployee().getId();
+          employeeWorkedHours.put(foundEmployeeId, employeeWorkedHours.get(foundEmployeeId) + programEntity.getWorkedHours());
           text = programEntity.getStation().getName();
+        }
+        else if (isEmployeeOnVacation(employees.get(i).getId(), date, vacations)) {
+        	text = "x";
         }
         addTextToCell(row.addNewTableCell(), text, weekend);
       }
@@ -421,12 +427,26 @@ public class ProgramService {
 
     for (int i = 0; i < employees.size(); i++) {
       row = table.getRows().get(i + 2);
-      int workedHours = employeeWorkedHours.get(employees.get(i).getId());
+      long employeeId = employees.get(i).getId();
+      int workedHours = employeeWorkedHours.get(employeeId);
+      workedHours += ruleService.getEmployeeVacationHours(employeeId, vacations);
       addTextToCell(row.addNewTableCell(), workedHours + "", false);
     }
   }
 
-  /**
+  private boolean isEmployeeOnVacation(long employeeId, Date date, List<RuleVacationEntity> vacations) {
+	for (RuleVacationEntity vacation:vacations) {
+		if (vacation.getEmployees().iterator().next().getId() == employeeId) {
+			if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
+				continue;
+			}
+			return true;
+		}
+	}
+	return false;
+  }
+
+/**
    * Checks if is day in weekend.
    *
    * @param date the date
