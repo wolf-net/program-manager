@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,6 @@ import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
 import ro.wolfnet.programmanager.service.generate.GenerateRule;
 import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
 import ro.wolfnet.programmanager.service.generate.VacationRule;
-import ro.wolfnet.programmanager.utils.Utils;
 
 /**
  * The Class RuleService.
@@ -157,48 +155,6 @@ public class RuleService {
       }
     }
     return vacationRules;
-  }
-
-  /**
-   * Gets the employee vacation hours.
-   *
-   * @param employeeId the employee id
-   * @param dayOfProgram 
-   * @param vacations the vacations
-   * @return the employee vacation hours
-   */
-  public int getEmployeeVacationHours(long employeeId, Date dayOfProgram, List<RuleVacationEntity> vacations) {
-    int vacationHours = 0;
-    Date firstDayOfProgram = Utils.getDateFromBeginningOfMonth(dayOfProgram);
-    Date lastDayOfProgram = Utils.getDateAtEndOfMonth(dayOfProgram);
-    for (RuleVacationEntity vacation : vacations) {
-      if (vacation.getEmployees().iterator().next().getId() == employeeId) {
-        if (vacation.getStart().before(firstDayOfProgram)) {
-          if (vacation.getEnd().before(firstDayOfProgram)) {
-            continue;
-          }
-          else if (vacation.getEnd().after(lastDayOfProgram)) {
-            vacationHours += Utils.getDateDifference(firstDayOfProgram, lastDayOfProgram, TimeUnit.HOURS);
-          }
-          else if (vacation.getEnd().after(firstDayOfProgram)) {
-            vacationHours += Utils.getDateDifference(firstDayOfProgram, vacation.getEnd(), TimeUnit.HOURS);
-          }
-          continue;
-        }
-        else if (vacation.getStart().after(lastDayOfProgram)) {
-          continue;
-        }
-        else if (vacation.getStart().after(firstDayOfProgram)) {
-          if (vacation.getEnd().after(lastDayOfProgram)) {
-            vacationHours += Utils.getDateDifference(vacation.getStart(), lastDayOfProgram, TimeUnit.HOURS);
-          }
-          else if (vacation.getEnd().before(lastDayOfProgram)) {
-            vacationHours += Utils.getDateDifference(vacation.getStart(), vacation.getEnd(), TimeUnit.HOURS);
-          }
-        }
-      }
-    }
-    return vacationHours;
   }
 
   /**

@@ -409,6 +409,7 @@ public class ProgramService {
           text = programEntity.getStation().getName();
         }
         else if (isEmployeeOnVacation(employees.get(i).getId(), date, vacations)) {
+          employeeWorkedHours.put(employees.get(i).getId(), employeeWorkedHours.get(employees.get(i).getId()) + 24);
         	text = "x";
         }
         addTextToCell(row.addNewTableCell(), text, weekend);
@@ -418,9 +419,7 @@ public class ProgramService {
     for (int i = 0; i < employees.size(); i++) {
       row = table.getRows().get(i + 2);
       long employeeId = employees.get(i).getId();
-      int workedHours = employeeWorkedHours.get(employeeId);
-      workedHours += ruleService.getEmployeeVacationHours(employeeId, dayOfProgram, vacations);
-      addTextToCell(row.addNewTableCell(), workedHours + "", false);
+      addTextToCell(row.addNewTableCell(), employeeWorkedHours.get(employeeId) + "", false);
     }
   }
 
