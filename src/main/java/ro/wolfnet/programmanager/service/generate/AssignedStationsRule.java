@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
+
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 
@@ -13,6 +15,7 @@ import ro.wolfnet.programmanager.model.EmployeeStatusModel;
  * @author isti
  * @since Mar 1, 2018
  */
+@Component
 public class AssignedStationsRule implements GenerateRule {
 
   /* (non-Javadoc)

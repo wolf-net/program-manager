@@ -2,6 +2,8 @@ package ro.wolfnet.programmanager.service;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,8 +15,13 @@ import org.springframework.stereotype.Service;
 import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.entity.RuleVacationEntity;
+import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.RuleModel;
 import ro.wolfnet.programmanager.repository.RuleRepository;
+import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
+import ro.wolfnet.programmanager.service.generate.GenerateRule;
+import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
+import ro.wolfnet.programmanager.service.generate.VacationRule;
 import ro.wolfnet.programmanager.utils.Utils;
 
 /**
@@ -29,6 +36,18 @@ public class RuleService {
   /** The rule repository. */
   @Autowired
   private RuleRepository ruleRepository;
+
+  /** The assigned stations rule. */
+  @Autowired
+  private AssignedStationsRule assignedStationsRule;
+
+  /** The vacation rule. */
+  @Autowired
+  private VacationRule vacationRule;
+
+  /** The less worked rule. */
+  @Autowired
+  private LessWorkedRule lessWorkedRule;
 
   /**
    * Save vacation rule.
@@ -140,14 +159,72 @@ public class RuleService {
     return vacationRules;
   }
 
-  public int getEmployeeVacationHours(long employeeId, List<RuleVacationEntity> vacations) {
-	int vacationHours = 0;
-	for (RuleVacationEntity vacation:vacations) {
-		if (vacation.getEmployees().iterator().next().getId() == employeeId) {
-			vacationHours += Utils.getDateDifference(vacation.getStart(), vacation.getEnd(), TimeUnit.HOURS);
-		}
-	}
-	return vacationHours;
+  /**
+   * Gets the employee vacation hours.
+   *
+   * @param employeeId the employee id
+   * @param dayOfProgram 
+   * @param vacations the vacations
+   * @return the employee vacation hours
+   */
+  public int getEmployeeVacationHours(long employeeId, Date dayOfProgram, List<RuleVacationEntity> vacations) {
+    int vacationHours = 0;
+    Date firstDayOfProgram = Utils.getDateFromBeginningOfMonth(dayOfProgram);
+    Date lastDayOfProgram = Utils.getDateAtEndOfMonth(dayOfProgram);
+    for (RuleVacationEntity vacation : vacations) {
+      if (vacation.getEmployees().iterator().next().getId() == employeeId) {
+        if (vacation.getStart().before(firstDayOfProgram)) {
+          if (vacation.getEnd().before(firstDayOfProgram)) {
+            continue;
+          }
+          else if (vacation.getEnd().after(lastDayOfProgram)) {
+            vacationHours += Utils.getDateDifference(firstDayOfProgram, lastDayOfProgram, TimeUnit.HOURS);
+          }
+          else if (vacation.getEnd().after(firstDayOfProgram)) {
+            vacationHours += Utils.getDateDifference(firstDayOfProgram, vacation.getEnd(), TimeUnit.HOURS);
+          }
+          continue;
+        }
+        else if (vacation.getStart().after(lastDayOfProgram)) {
+          continue;
+        }
+        else if (vacation.getStart().after(firstDayOfProgram)) {
+          if (vacation.getEnd().after(lastDayOfProgram)) {
+            vacationHours += Utils.getDateDifference(vacation.getStart(), lastDayOfProgram, TimeUnit.HOURS);
+          }
+          else if (vacation.getEnd().before(lastDayOfProgram)) {
+            vacationHours += Utils.getDateDifference(vacation.getStart(), vacation.getEnd(), TimeUnit.HOURS);
+          }
+        }
+      }
+    }
+    return vacationHours;
+  }
+
+  /**
+   * Filtere employees by rules.
+   *
+   * @param stationId the station id
+   * @param date the date
+   * @param allEmployees the all employees
+   * @param rules the rules
+   * @return the list
+   */
+  public List<EmployeeStatusModel> filtereEmployeesByRules(long stationId, Date date, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) {
+    if (allEmployees == null || allEmployees.size() == 0) {
+      return null;
+    }
+
+    if (rules == null || rules.size() == 0) {
+      return allEmployees;
+    }
+
+    List<GenerateRule> generateRules = Arrays.asList(assignedStationsRule, vacationRule, lessWorkedRule);
+    for (GenerateRule rule : generateRules) {
+      allEmployees = rule.filterEmployees(stationId, date, allEmployees, rules);
+    }
+
+    return allEmployees;
   }
 
 }

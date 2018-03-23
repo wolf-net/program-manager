@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,10 +38,6 @@ import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
 import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.ProgramRepository;
-import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
-import ro.wolfnet.programmanager.service.generate.GenerateRule;
-import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
-import ro.wolfnet.programmanager.service.generate.VacationRule;
 import ro.wolfnet.programmanager.utils.IncompatibleRulesException;
 
 /**
@@ -126,7 +121,7 @@ public class ProgramService {
 
     List<StationModel> allStations = stationService.findAll();
     List<RuleBaseEntity> rules = ruleService.findRuleEntities();
-    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses(rules);
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
     List<ProgramEntity> programsForDay = null;
     for (long generateStartMillis = System.currentTimeMillis(); programsForDay == null;) {
       programsForDay = getProgramsForOneDay(dayOfProgram, allStations, copyEmployeeList(allEmployees), rules);
@@ -150,8 +145,9 @@ public class ProgramService {
     }
 
     List<EmployeeStatusModel> result = new ArrayList<>();
-    for (EmployeeStatusModel employee : allEmployees) {
-      result.add(employee);
+    for (EmployeeStatusModel oldEmployee : allEmployees) {
+      EmployeeStatusModel newEmployee = new EmployeeStatusModel(oldEmployee);
+      result.add(newEmployee);
     }
     return result;
   }
@@ -206,30 +202,24 @@ public class ProgramService {
     }
     return newPrograms;
   }
-
-  /** The generate rules. */
-  private static List<GenerateRule> generateRules = Arrays.asList(new AssignedStationsRule(), new VacationRule(), new LessWorkedRule());
-
+  
   /**
    * Gets the random employee model from list.
    *
    * @param stationId the station id
-   * @param allEmployees the all employees
+   * @param filteredEmployees the all employees
    * @return the random employee model from list
    * @throws IncompatibleRulesException the incompatible rules exception
    */
   private EmployeeStatusModel getRandomEmployeeModelFromList(long stationId, Date date, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) throws IncompatibleRulesException {
-    if (allEmployees == null || allEmployees.size() == 0) {
+    List<EmployeeStatusModel> filteredEmployees = ruleService.filtereEmployeesByRules(stationId, date, allEmployees, rules);
+    if (filteredEmployees == null || filteredEmployees.size() == 0) {
       throw new IncompatibleRulesException();
     }
 
-    for (GenerateRule rule : generateRules) {
-      allEmployees = rule.filterEmployees(stationId, date, allEmployees, rules);
-    }
-
     try {
-      int idx = (int) (Math.random() * (allEmployees.size() - 0)) + 0;
-      return allEmployees.get(idx);
+      int idx = (int) (Math.random() * (filteredEmployees.size() - 0)) + 0;
+      return filteredEmployees.get(idx);
     } catch (IndexOutOfBoundsException e) {
       throw new IncompatibleRulesException();
     }
@@ -254,7 +244,7 @@ public class ProgramService {
 
     List<StationModel> allStations = stationService.findAll();
     List<RuleBaseEntity> rules = ruleService.findRuleEntities();
-    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses(rules);
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
     List<ProgramEntity> programsForMonth = new ArrayList<>();
     long generateStartMillis = System.currentTimeMillis();
     for (Date date : datesOfMonth) {
@@ -429,7 +419,7 @@ public class ProgramService {
       row = table.getRows().get(i + 2);
       long employeeId = employees.get(i).getId();
       int workedHours = employeeWorkedHours.get(employeeId);
-      workedHours += ruleService.getEmployeeVacationHours(employeeId, vacations);
+      workedHours += ruleService.getEmployeeVacationHours(employeeId, dayOfProgram, vacations);
       addTextToCell(row.addNewTableCell(), workedHours + "", false);
     }
   }

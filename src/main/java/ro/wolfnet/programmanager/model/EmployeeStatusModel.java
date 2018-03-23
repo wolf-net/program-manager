@@ -11,7 +11,7 @@ import java.util.Date;
 public class EmployeeStatusModel extends EmployeeModel {
 
   /** The worked hours. */
-  private int workedHours;
+  private double workedHours;
 
   /** The last worked. */
   private Date lastWorked;
@@ -20,6 +20,17 @@ public class EmployeeStatusModel extends EmployeeModel {
    * Instantiates a new employee status model.
    */
   public EmployeeStatusModel() {
+  }
+
+  /**
+   * Instantiates a new employee status model.
+   *
+   * @param employeeStatusModel the employee status model
+   */
+  public EmployeeStatusModel(EmployeeStatusModel employeeStatusModel) {
+    this((EmployeeModel) employeeStatusModel);
+    this.setLastWorked(employeeStatusModel.getLastWorked());
+    this.setWorkedHours(employeeStatusModel.getWorkedHours());
   }
 
   /**
@@ -42,7 +53,7 @@ public class EmployeeStatusModel extends EmployeeModel {
    *
    * @return the worked hours
    */
-  public int getWorkedHours() {
+  public double getWorkedHours() {
     return workedHours;
   }
 
@@ -51,7 +62,7 @@ public class EmployeeStatusModel extends EmployeeModel {
    *
    * @param workedHours the new worked hours
    */
-  public void setWorkedHours(int workedHours) {
+  public void setWorkedHours(double workedHours) {
     this.workedHours = workedHours;
   }
 

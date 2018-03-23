@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 
@@ -15,6 +17,7 @@ import ro.wolfnet.programmanager.model.EmployeeStatusModel;
  * @author isti
  * @since Mar 1, 2018
  */
+@Component
 public class LessWorkedRule implements GenerateRule {
 
   /* (non-Javadoc)
@@ -29,7 +32,7 @@ public class LessWorkedRule implements GenerateRule {
     Collections.sort(employees, new Comparator<EmployeeStatusModel>() {
       @Override
       public int compare(EmployeeStatusModel o1, EmployeeStatusModel o2) {
-        int res = new Integer(o1.getWorkedHours()).compareTo(new Integer(o2.getWorkedHours()));
+        int res = new Double(o1.getWorkedHours()).compareTo(new Double(o2.getWorkedHours()));
         if (res == 0) {
           res = getDate(o1.getLastWorked()).compareTo(getDate(o2.getLastWorked()));
         }
@@ -52,7 +55,7 @@ public class LessWorkedRule implements GenerateRule {
       return 0;
     }
 
-    int lessWorkingHour = allEmployees.get(0).getWorkedHours();
+    double lessWorkingHour = allEmployees.get(0).getWorkedHours();
     Date lastWorked = getDate(allEmployees.get(0).getLastWorked());
     int index = 0;
     while (index < allEmployees.size() && allEmployees.get(index).getWorkedHours() == lessWorkingHour &&
