@@ -46,7 +46,7 @@ public class VacationRule implements GenerateRule {
     for (RuleVacationEntity vacation : vacationRules) {
       if (vacation.getEmployees().iterator().next().getId() == employee.getId()) {
         if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
-          double vacationPercentWorkedHours = Utils.getDateDifference(vacation.getStart(), vacation.getEnd(), TimeUnit.HOURS) / Utils.getDayOfMonthNumbers(date);
+          double vacationPercentWorkedHours = (Utils.getDateDifference(vacation.getStart(), vacation.getEnd(), TimeUnit.DAYS) * 8) / Utils.getDayOfMonthNumbers(date);
           vacationPercentWorkedHours *= Utils.getDateDifference(Utils.getDateFromBeginningOfMonth(date), date, TimeUnit.DAYS);
           employee.setWorkedHours(employee.getWorkedHours() + vacationPercentWorkedHours);
           continue;

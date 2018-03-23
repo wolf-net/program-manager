@@ -409,7 +409,7 @@ public class ProgramService {
           text = programEntity.getStation().getName();
         }
         else if (isEmployeeOnVacation(employees.get(i).getId(), date, vacations)) {
-          employeeWorkedHours.put(employees.get(i).getId(), employeeWorkedHours.get(employees.get(i).getId()) + 24);
+          employeeWorkedHours.put(employees.get(i).getId(), employeeWorkedHours.get(employees.get(i).getId()) + 8);
         	text = "x";
         }
         addTextToCell(row.addNewTableCell(), text, weekend);
