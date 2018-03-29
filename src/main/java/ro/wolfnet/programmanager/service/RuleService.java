@@ -166,7 +166,7 @@ public class RuleService {
    * @param rules the rules
    * @return the list
    */
-  public List<EmployeeStatusModel> filtereEmployeesByRules(long stationId, Date date, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) {
+  public List<EmployeeStatusModel> filterEmployeesByRules(long stationId, Date date, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) {
     if (allEmployees == null || allEmployees.size() == 0) {
       return null;
     }
@@ -181,6 +181,34 @@ public class RuleService {
     }
 
     return allEmployees;
+  }
+
+  /**
+   * Filter active vacations.
+   *
+   * @param rules the rules
+   * @return the list
+   */
+  public List<RuleVacationEntity> filterActiveVacations(List<RuleBaseEntity> rules) {
+    if (rules == null) {
+      return null;
+    }
+
+    Date today = new Date();
+    List<RuleVacationEntity> activeVacations = new ArrayList<>();
+    for (RuleBaseEntity rule : rules) {
+      if (!(rule instanceof RuleVacationEntity)) {
+        continue;
+      }
+
+      RuleVacationEntity vacation = (RuleVacationEntity) rule;
+      if (vacation.getStart().after(today) || vacation.getEnd().before(today)) {
+        continue;
+      }
+
+      activeVacations.add(vacation);
+    }
+    return activeVacations;
   }
 
 }

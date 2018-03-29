@@ -46,6 +46,9 @@ public class EmployeeEntity {
   /** The vacations. */
   private Set<RuleBaseEntity> rules;
 
+  /** The replaces. */
+  private Set<RuleVacationEntity> replaces;
+
   /**
    * Gets the id.
    *
@@ -190,10 +193,29 @@ public class EmployeeEntity {
   /**
    * Sets the vacations.
    *
-   * @param vacations the new vacations
+   * @param rules the new rules
    */
   public void setRules(Set<RuleBaseEntity> rules) {
     this.rules = rules;
+  }
+
+  /**
+   * Gets the replaces.
+   *
+   * @return the replaces
+   */
+  @ManyToMany(mappedBy = "replacers", cascade = CascadeType.ALL)
+  public Set<RuleVacationEntity> getReplaces() {
+    return replaces;
+  }
+
+  /**
+   * Sets the replaces.
+   *
+   * @param replaces the new replaces
+   */
+  public void setReplaces(Set<RuleVacationEntity> replaces) {
+    this.replaces = replaces;
   }
 
 }

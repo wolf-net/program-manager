@@ -763,14 +763,15 @@ p.info {
 .wizard-container .wizard-prev i,
 .wizard-container .wizard-next i,
 .wizard-container .wizard-save i {
-	position:fixed;
     font-size: 2em;
-    margin-top: -30px;
 }
 
-.wizard-container .wizard-next i,
+.wizard-container .wizard-next i {
+    margin-right: -58px;
+}
+
 .wizard-container .wizard-save i {
-    margin-left: -30px;
+    margin-right: -40px;
 }
 
 .wizard-container .wizard-prev i {

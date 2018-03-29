@@ -212,7 +212,7 @@ public class ProgramService {
    * @throws IncompatibleRulesException the incompatible rules exception
    */
   private EmployeeStatusModel getRandomEmployeeModelFromList(long stationId, Date date, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) throws IncompatibleRulesException {
-    List<EmployeeStatusModel> filteredEmployees = ruleService.filtereEmployeesByRules(stationId, date, allEmployees, rules);
+    List<EmployeeStatusModel> filteredEmployees = ruleService.filterEmployeesByRules(stationId, date, allEmployees, rules);
     if (filteredEmployees == null || filteredEmployees.size() == 0) {
       throw new IncompatibleRulesException();
     }

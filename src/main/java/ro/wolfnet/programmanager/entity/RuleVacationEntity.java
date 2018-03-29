@@ -1,8 +1,11 @@
 package ro.wolfnet.programmanager.entity;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 
 /**
  * The Class RuleVacationEntity.
@@ -18,6 +21,29 @@ public class RuleVacationEntity extends RuleBaseEntity {
 
   /** The end. */
   private Date end;
+
+  /** The replacer. */
+  private Set<EmployeeEntity> replacers;
+
+  /**
+   * Gets the replacers.
+   *
+   * @return the replacers
+   */
+  @ManyToMany
+  @JoinColumn(name = "employee_entity_id")
+  public Set<EmployeeEntity> getReplacers() {
+    return replacers;
+  }
+
+  /**
+   * Sets the replacers.
+   *
+   * @param replacers the new replacers
+   */
+  public void setReplacers(Set<EmployeeEntity> replacers) {
+    this.replacers = replacers;
+  }
 
   /**
    * Gets the start.
