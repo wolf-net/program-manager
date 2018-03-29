@@ -17,14 +17,19 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageMar;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTPageSz;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSectPr;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTSpacing;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblBorders;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblPr;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTTblWidth;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STBorder;
+import org.openxmlformats.schemas.wordprocessingml.x2006.main.STLineSpacingRule;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -335,8 +340,15 @@ public class ProgramService {
    */
   public InputStream exportProgramForOneMonth(Date dayOfProgram) throws Exception {
     XWPFDocument document = new XWPFDocument();
+    
+    CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
+    CTPageMar pageMar = sectPr.addNewPgMar();
+    pageMar.setLeft(BigInteger.valueOf(720L));
+    pageMar.setTop(BigInteger.valueOf(720L));
+    pageMar.setRight(BigInteger.valueOf(720L));
+    pageMar.setBottom(BigInteger.valueOf(720L));
+    
     XWPFTable table = document.createTable();
-
     CTBody body = document.getDocument().getBody();
     if (!body.isSetSectPr()) {
       body.addNewSectPr();
@@ -387,6 +399,7 @@ public class ProgramService {
       row = table.createRow();
       employeeWorkedHours.put(employee.getId(), 0);
       row.getCell(0).setText(employee.getName());
+      allignVerticalToMiddle(row.getCell(0));
     }
 
     List<RuleBaseEntity> rules = ruleService.findRuleEntities();
@@ -423,7 +436,24 @@ public class ProgramService {
     }
   }
 
-  private boolean isEmployeeOnVacation(long employeeId, Date date, List<RuleVacationEntity> vacations) {
+  private void allignVerticalToMiddle(XWPFTableCell cell) {
+      cell.setVerticalAlignment(XWPFVertAlign.CENTER);
+      XWPFParagraph para = cell.getParagraphArray(0);
+      CTPPr ppr = para.getCTP().getPPr();
+      if (ppr == null) {
+    	  ppr = para.getCTP().addNewPPr();
+      }
+      CTSpacing spacing = ppr.isSetSpacing()? ppr.getSpacing() : ppr.addNewSpacing();
+      spacing.setAfter(BigInteger.valueOf(0));
+      spacing.setBefore(BigInteger.valueOf(0));
+      spacing.setLineRule(STLineSpacingRule.AUTO);
+      spacing.setLine(BigInteger.valueOf(240));
+}
+
+private boolean isEmployeeOnVacation(long employeeId, Date date, List<RuleVacationEntity> vacations) {
+	  if (vacations == null) {
+		  return false;
+	  }
 	for (RuleVacationEntity vacation:vacations) {
 		if (vacation.getEmployees().iterator().next().getId() == employeeId) {
 			if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
@@ -462,6 +492,7 @@ public class ProgramService {
     if (greyBackground) {
       cell.setColor("E2E2E2");
     }
+    allignVerticalToMiddle(cell);
   }
 
   /**

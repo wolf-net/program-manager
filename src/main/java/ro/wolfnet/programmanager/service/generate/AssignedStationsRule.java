@@ -37,23 +37,24 @@ public class AssignedStationsRule implements GenerateRule {
       return null;
     }
 
-    return employees.stream().filter(employee -> canEmployeeWorkInStation(stationId, employee, rules)).collect(Collectors.toList());
+    return employees.stream().filter(employee -> canEmployeeWorkInStation(stationId, date, employee, rules)).collect(Collectors.toList());
   }
 
   /**
    * Can employee work in station.
    *
    * @param stationId the station id
+ * @param date 
    * @param employee the employee
    * @param rules the rules
    * @return true, if successful
    */
-  private boolean canEmployeeWorkInStation(long stationId, EmployeeStatusModel employee, List<RuleBaseEntity> rules) {
+  private boolean canEmployeeWorkInStation(long stationId, Date date, EmployeeStatusModel employee, List<RuleBaseEntity> rules) {
     if (isEmployeePrimaryAssignedToStation(stationId, employee)) {
       return true;
     }
 
-    if (isEmployeeReplacement(stationId, employee, rules)) {
+    if (isEmployeeReplacement(stationId, employee, date, rules)) {
       return true;
     }
 
@@ -65,11 +66,12 @@ public class AssignedStationsRule implements GenerateRule {
    *
    * @param stationId the station id
    * @param employee the employee
+ * @param date 
    * @param rules the rules
    * @return true, if is employee replacement
    */
-  private boolean isEmployeeReplacement(long stationId, EmployeeStatusModel employee, List<RuleBaseEntity> rules) {
-    List<RuleVacationEntity> activeVacations = ruleService.filterActiveVacations(rules);
+  private boolean isEmployeeReplacement(long stationId, EmployeeStatusModel employee, Date date, List<RuleBaseEntity> rules) {
+    List<RuleVacationEntity> activeVacations = ruleService.filterActiveVacations(date, rules);
     if (employee == null || activeVacations == null || activeVacations.size() == 0) {
       return false;
     }

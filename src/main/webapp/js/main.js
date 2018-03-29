@@ -453,7 +453,8 @@ function loadRules() {
 					'<div class="card-content">' + 
 						'<input type="hidden" id="ruleId" value="' + element.ruleId + '" />' +
 						'<div class="name-display">' + element.employeeName + '</div>' +
-						'<div class="interval-display">' + formatDate(new Date(element.startDate)) + ' - ' + formatDate(new Date(element.endDate)) + '</div>' +   
+						'<div class="interval-display">' + formatDate(new Date(element.startDate)) + ' - ' + formatDate(new Date(element.endDate)) + '</div>' +
+						'<div>Replacers: ' + element.replacersName + '</div>' +
 					'</div>' +
 					'<div class="card-buttons">' +
 						'<i class="fa fa-trash-o" onclick="deleteRule(this);"></i>' + 
@@ -516,10 +517,13 @@ function ruleTypeChanged() {
 		    '<input name="endDate" type="date">' +
 		    'Employee:' +
 		    '<input name="employee" />' +
+		    'Replacers:' +
+		    '<select name="replacers" multiple="multiple" />' +
 		    '</form>' +
 		    '</section>');
 
 		initializeEmployeeInput($('.wizard [name="employee"]'));
+		initializeEmployeeInput($('.wizard [name="replacers"]'));
 	}
 	else if (selected == 'together') {
 		$('.wizard').append(
@@ -531,10 +535,10 @@ function ruleTypeChanged() {
 
 function saveRule() {
 	var data = {};
-	$('#ruleForm').find('input').each(function(idx, input) {
+	$.merge($('#ruleForm').find('input'), $('#ruleForm').find('select')).each(function(idx, input) {
 		var jInput = $(input);
 		data[jInput.attr('name')] = jInput.val();
-	})
+	});
 
 	$.ajax({
 		url: "rule",

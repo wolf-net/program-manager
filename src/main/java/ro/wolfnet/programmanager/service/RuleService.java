@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -67,6 +68,16 @@ public class RuleService {
     employeeEntity.setId(ruleModel.getEmployee());
     employees.add(employeeEntity);
     entity.setEmployees(employees);
+    
+    if (ruleModel.getReplacers() != null) {
+    	entity.setReplacers(new HashSet<>());
+    	for (long replacer:ruleModel.getReplacers()) {
+    		EmployeeEntity replacerEntity = new EmployeeEntity();
+    		replacerEntity.setId(replacer);
+    		entity.getReplacers().add(replacerEntity);
+    		
+    	}
+    }
 
     ruleRepository.save(entity);
   }
@@ -115,6 +126,14 @@ public class RuleService {
     model.setEndDate(rule.getEnd());
     model.setStartDate(rule.getStart());
     model.setRuleType(RuleModel.RULE_TYPE_VACATION);
+    if (rule.getReplacers() != null) {
+    	String[] replacersName = new String[rule.getReplacers().size()];
+    	Iterator<EmployeeEntity> replacersIterator = rule.getReplacers().iterator();
+    	for (int i = 0; replacersIterator.hasNext(); i++) {
+    		replacersName[i] = replacersIterator.next().getName();
+    	}
+    	model.setReplacersName(replacersName);
+    }
     return model;
   }
 
@@ -171,10 +190,6 @@ public class RuleService {
       return null;
     }
 
-    if (rules == null || rules.size() == 0) {
-      return allEmployees;
-    }
-
     List<GenerateRule> generateRules = Arrays.asList(assignedStationsRule, vacationRule, lessWorkedRule);
     for (GenerateRule rule : generateRules) {
       allEmployees = rule.filterEmployees(stationId, date, allEmployees, rules);
@@ -185,16 +200,16 @@ public class RuleService {
 
   /**
    * Filter active vacations.
+ * @param date 
    *
    * @param rules the rules
    * @return the list
    */
-  public List<RuleVacationEntity> filterActiveVacations(List<RuleBaseEntity> rules) {
+  public List<RuleVacationEntity> filterActiveVacations(Date date, List<RuleBaseEntity> rules) {
     if (rules == null) {
       return null;
     }
 
-    Date today = new Date();
     List<RuleVacationEntity> activeVacations = new ArrayList<>();
     for (RuleBaseEntity rule : rules) {
       if (!(rule instanceof RuleVacationEntity)) {
@@ -202,7 +217,7 @@ public class RuleService {
       }
 
       RuleVacationEntity vacation = (RuleVacationEntity) rule;
-      if (vacation.getStart().after(today) || vacation.getEnd().before(today)) {
+      if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
         continue;
       }
 

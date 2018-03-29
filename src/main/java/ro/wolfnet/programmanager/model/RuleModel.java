@@ -29,6 +29,10 @@ public class RuleModel {
 
 	private String employeeName;
 
+    private long[] replacers;
+
+	private String[] replacersName;
+
 	/**
 	 * Gets the start date.
 	 *
@@ -119,5 +123,21 @@ public class RuleModel {
 
 	public void setRuleId(long ruleId) {
 		this.ruleId = ruleId;
+	}
+
+	public long[] getReplacers() {
+		return replacers;
+	}
+
+	public void setReplacers(long[] replacers) {
+		this.replacers = replacers;
+	}
+
+	public String[] getReplacersName() {
+		return replacersName;
+	}
+
+	public void setReplacersName(String[] replacersName) {
+		this.replacersName = replacersName;
 	}
 }
