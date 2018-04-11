@@ -78,21 +78,12 @@ public class VacationRule implements GenerateRule {
 /**
    * Gets the aux worked hours.
    * 
-   * Rule: (my estimated worked hours on vacation interval - my vacation hours) /
+   * Rule: ((how many assigned stations I have * worked employees on each one / how many employees will work in this interval) - my vacation hours) /
    * (month days - my vacation days) * day of month without vacations * -1
    *
    * @return the aux worked hours
    */
-  private double getAuxWorkedHours(Date date, List<RuleVacationEntity> vacationsOfEmployee) {
-	  int myVacationHours = getVacationHours(date, vacationsOfEmployee);
-	  if (myVacationHours <= 0) {
-		  return 0;
-	  }
-	  
-      return 0;
-  }
-
-  private int getVacationHours(Date date, List<RuleVacationEntity> vacationsOfEmployee) {
+  private int getAuxWorkedHours(Date date, List<RuleVacationEntity> vacationsOfEmployee) {
 	  if (date == null || vacationsOfEmployee == null || vacationsOfEmployee.size() == 0) {
 		  return 0;
 	  }
