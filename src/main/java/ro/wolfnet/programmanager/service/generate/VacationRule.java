@@ -59,4 +59,16 @@ public class VacationRule implements GenerateRule {
     return employee;
   }
 
+  /**
+   * Gets the aux worked hours.
+   * 
+   * Rule: (my estimated worked hours on vacation interval - my vacation hours) /
+   * (month days - my vacation days) * day of month without vacations * -1
+   *
+   * @return the aux worked hours
+   */
+  private double getAuxWorkedHours() {
+    return 0;
+  }
+
 }
