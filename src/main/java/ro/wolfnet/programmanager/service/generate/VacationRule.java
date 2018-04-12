@@ -5,11 +5,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.entity.RuleVacationEntity;
+import ro.wolfnet.programmanager.entity.StationEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
+import ro.wolfnet.programmanager.repository.StationRepository;
 import ro.wolfnet.programmanager.service.RuleService;
 import ro.wolfnet.programmanager.utils.Utils;
 
@@ -21,6 +25,9 @@ import ro.wolfnet.programmanager.utils.Utils;
  */
 @Component
 public class VacationRule implements GenerateRule {
+	
+	@Autowired
+	private StationRepository stationRepository;
 
   /* (non-Javadoc)
    * @see ro.wolfnet.programmanager.service.generate.GenerateRule#filterEmployees(long, java.util.Date, java.util.List, java.util.List)
@@ -43,7 +50,7 @@ public class VacationRule implements GenerateRule {
   }
 
   private EmployeeStatusModel getAvailableEmployee(Date date, EmployeeStatusModel employee, List<RuleVacationEntity> vacationRules) {
-	List<RuleVacationEntity> myVacations = getVacationsOfEmployee(employee, vacationRules);
+	List<RuleVacationEntity> myVacations = getVacationsOfEmployee(employee.getId(), vacationRules);
 	if (myVacations == null || myVacations.size() == 0) {
 		return employee;
 	}
@@ -61,14 +68,14 @@ public class VacationRule implements GenerateRule {
     return employee;
   }
 
-  private List<RuleVacationEntity> getVacationsOfEmployee(EmployeeStatusModel employee, List<RuleVacationEntity> vacationRules) {
-	if (employee == null || vacationRules == null || vacationRules.size() == 0) {
+  private List<RuleVacationEntity> getVacationsOfEmployee(long employeeId, List<RuleVacationEntity> vacationRules) {
+	if (employeeId == 0 || vacationRules == null || vacationRules.size() == 0) {
 		return null;
 	}
 	
 	List<RuleVacationEntity> myVacations = new ArrayList<>();
 	for (RuleVacationEntity vacation:vacationRules) {
-		if (vacation.getEmployees().iterator().next().getId() == employee.getId()) {
+		if (vacation.getEmployees().iterator().next().getId() == employeeId) {
 			myVacations.add(vacation);
 		}
 	}
@@ -83,23 +90,68 @@ public class VacationRule implements GenerateRule {
    *
    * @return the aux worked hours
    */
-  private int getAuxWorkedHours(Date date, List<RuleVacationEntity> vacationsOfEmployee) {
+  private double getAuxWorkedHours(Date date, EmployeeStatusModel employee, List<RuleVacationEntity> vacationsOfEmployee, List<RuleVacationEntity> allVacations) {
 	  if (date == null || vacationsOfEmployee == null || vacationsOfEmployee.size() == 0) {
 		  return 0;
 	  }
 	  
-	  int result = 0;
+	  double workedHoursDifferenceBetweenMeAndOthers = 0;
 	  Date start = Utils.getDateFromBeginningOfMonth(date);
 	  Date end = Utils.getDateAtEndOfMonth(date);
+	  List<StationEntity> employeeStations = stationRepository.getStationsOfEmployee(employee.getId());
 	  for (RuleVacationEntity vacation:vacationsOfEmployee) {
 		  Date calcStart = Utils.getMaximum(start, vacation.getStart());
 		  Date calcEnd = Utils.getMinimum(end, vacation.getEnd());
 		  if (calcStart.after(calcEnd)) {
 			  continue;
 		  }
-		  result += Utils.getDateDifference(calcStart, calcEnd, TimeUnit.DAYS) * 8;
+		  double myVacationHours = Utils.getDateDifference(calcStart, calcEnd, TimeUnit.DAYS) * 8;
+		  double othersWorkedHours = getWorkedHoursOfOneEmployeeWithoutMe(employeeStations, calcStart, calcEnd, allVacations);
+		  workedHoursDifferenceBetweenMeAndOthers += (othersWorkedHours - myVacationHours);
 	  }
-	  return result;
+	  return workedHoursDifferenceBetweenMeAndOthers;
   }
+
+	private double getWorkedHoursOfOneEmployeeWithoutMe(List<StationEntity> employeeStations, Date startInterval, Date endInterval, List<RuleVacationEntity> allVacations) {
+		if (employeeStations == null || startInterval == null || endInterval == null || allVacations == null) {
+			return 0;
+		}
+		
+		double result = 0;
+		double daysNumber = Utils.getDateDifference(startInterval, endInterval, TimeUnit.DAYS);
+		for (StationEntity station:employeeStations) {
+			int availableEmployeesNumber = getAvailableEmployeesNumberForStationWithinInterval(station, startInterval, endInterval, allVacations);
+			result += (station.getCapacity() * daysNumber / availableEmployeesNumber);
+		}
+		return result;
+	}
+
+	private int getAvailableEmployeesNumberForStationWithinInterval(StationEntity station, Date startInterval, Date endInterval, List<RuleVacationEntity> allVacations) {
+		if (station == null || startInterval == null || endInterval == null) {
+			return 0;
+		}
+		
+		int availableEmployeesNumber = 0;
+		for (EmployeeEntity employee:station.getEmployees()) {
+			List<RuleVacationEntity> employeeVacations = getVacationsOfEmployee(employee.getId(), allVacations);
+			if (!isEmployeeOnVacationBetweenInterval(employeeVacations, startInterval, endInterval)) {
+				availableEmployeesNumber ++;
+			}
+		}
+		return availableEmployeesNumber;
+	}
+
+	private boolean isEmployeeOnVacationBetweenInterval(List<RuleVacationEntity> employeeVacations, Date startInterval, Date endInterval) {
+		if (employeeVacations == null || startInterval == null || endInterval == null) {
+			return false;
+		}
+		for (RuleVacationEntity vacation:employeeVacations) {
+			if (vacation.getStart().before(startInterval) || vacation.getEnd().after(endInterval)) {
+				continue;
+			}
+			return true;
+		}
+		return false;
+	}
 
 }
