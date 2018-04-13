@@ -16,6 +16,6 @@ import ro.wolfnet.programmanager.entity.StationEntity;
  */
 public interface StationRepository extends JpaRepository<StationEntity, Long> {
 
-	@Query("SELECT s FROM StationEntity p where s.employees.id in :employeeId")
+	@Query("SELECT e.stations FROM EmployeeEntity e where e.id in :employeeId")
 	List<StationEntity> getStationsOfEmployee(@Param("employeeId") long employeeId);
 }

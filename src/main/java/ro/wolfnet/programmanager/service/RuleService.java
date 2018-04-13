@@ -22,6 +22,7 @@ import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
 import ro.wolfnet.programmanager.service.generate.GenerateRule;
 import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
 import ro.wolfnet.programmanager.service.generate.VacationRule;
+import ro.wolfnet.programmanager.utils.Utils;
 
 /**
  * The Class RuleService.
@@ -60,8 +61,8 @@ public class RuleService {
     }
 
     RuleVacationEntity entity = new RuleVacationEntity();
-    entity.setStart(ruleModel.getStartDate());
-    entity.setEnd(ruleModel.getEndDate());
+    entity.setStart(Utils.getDateFromBeginningOfDay(ruleModel.getStartDate()));
+    entity.setEnd(Utils.getDateFromBeginningOfDay(ruleModel.getEndDate()));
 
     Set<EmployeeEntity> employees = new HashSet<>();
     EmployeeEntity employeeEntity = new EmployeeEntity();

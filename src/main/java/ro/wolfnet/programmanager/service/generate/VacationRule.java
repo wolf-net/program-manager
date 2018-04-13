@@ -1,8 +1,10 @@
 package ro.wolfnet.programmanager.service.generate;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,9 +59,7 @@ public class VacationRule implements GenerateRule {
 	
     for (RuleVacationEntity vacation : myVacations) {
         if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
-          double vacationPercentWorkedHours = (Utils.getDateDifference(vacation.getStart(), vacation.getEnd(), TimeUnit.DAYS) * 8) / Utils.getDayOfMonthNumbers(date);
-          vacationPercentWorkedHours *= Utils.getDateDifference(Utils.getDateFromBeginningOfMonth(date), date, TimeUnit.DAYS);
-          employee.setWorkedHours(employee.getWorkedHours() + vacationPercentWorkedHours);
+          employee.setWorkedHours(employee.getWorkedHours() + getAuxWorkedHours(date, employee, myVacations, vacationRules));
           continue;
         }
         //employee is on vacation
@@ -86,18 +86,19 @@ public class VacationRule implements GenerateRule {
    * Gets the aux worked hours.
    * 
    * Rule: ((how many assigned stations I have * worked employees on each one / how many employees will work in this interval) - my vacation hours) /
-   * (month days - my vacation days) * day of month without vacations * -1
+   * work days number * work day index * -1
    *
    * @return the aux worked hours
    */
-  private double getAuxWorkedHours(Date date, EmployeeStatusModel employee, List<RuleVacationEntity> vacationsOfEmployee, List<RuleVacationEntity> allVacations) {
-	  if (date == null || vacationsOfEmployee == null || vacationsOfEmployee.size() == 0) {
+  private double getAuxWorkedHours(Date workDate, EmployeeStatusModel employee, List<RuleVacationEntity> vacationsOfEmployee, List<RuleVacationEntity> allVacations) {
+	  if (workDate == null || vacationsOfEmployee == null || vacationsOfEmployee.size() == 0) {
 		  return 0;
 	  }
 	  
 	  double workedHoursDifferenceBetweenMeAndOthers = 0;
-	  Date start = Utils.getDateFromBeginningOfMonth(date);
-	  Date end = Utils.getDateAtEndOfMonth(date);
+	  Date start = Utils.getDateFromBeginningOfMonth(workDate);
+	  Date end = Utils.getDateAtEndOfMonth(workDate);
+	  List<Date> vacationDays = new ArrayList<>();
 	  List<StationEntity> employeeStations = stationRepository.getStationsOfEmployee(employee.getId());
 	  for (RuleVacationEntity vacation:vacationsOfEmployee) {
 		  Date calcStart = Utils.getMaximum(start, vacation.getStart());
@@ -105,11 +106,37 @@ public class VacationRule implements GenerateRule {
 		  if (calcStart.after(calcEnd)) {
 			  continue;
 		  }
-		  double myVacationHours = Utils.getDateDifference(calcStart, calcEnd, TimeUnit.DAYS) * 8;
+		  double myVacationHours = getVacationDays(calcStart, calcEnd) * 8;
 		  double othersWorkedHours = getWorkedHoursOfOneEmployeeWithoutMe(employeeStations, calcStart, calcEnd, allVacations);
 		  workedHoursDifferenceBetweenMeAndOthers += (othersWorkedHours - myVacationHours);
+		  vacationDays.addAll(Utils.getDatesBetweenTwoDates(calcStart, calcEnd));
 	  }
-	  return workedHoursDifferenceBetweenMeAndOthers;
+	  
+	  int workDayIndex = 1;
+	  int totalWorkDaysThisMonth = 0;
+	  Calendar cal = Calendar.getInstance();
+	  cal.setTime(start);
+	  while (!cal.getTime().after(end)) {
+		  cal.add(Calendar.DAY_OF_MONTH, 1);
+		  if (!Utils.areDatesContainDate(vacationDays, cal.getTime())) {
+			  totalWorkDaysThisMonth++;
+		  }
+		  if (!cal.getTime().after(workDate)) {
+			  workDayIndex++;
+		  }
+	  }
+	  return workedHoursDifferenceBetweenMeAndOthers / totalWorkDaysThisMonth * workDayIndex * (-1);
+  }
+
+  private long getVacationDays(Date calcStart, Date calcEnd) {
+	if (calcStart == null || calcEnd == null || calcStart.after(calcEnd)) {
+		return 0;
+	}
+	long diff = Utils.getDateDifference(calcStart, calcEnd, TimeUnit.DAYS) + 1;
+	if (calcStart.getTime() != calcEnd.getTime()) {
+		diff++;
+	}
+	return diff;
   }
 
 	private double getWorkedHoursOfOneEmployeeWithoutMe(List<StationEntity> employeeStations, Date startInterval, Date endInterval, List<RuleVacationEntity> allVacations) {
@@ -118,10 +145,10 @@ public class VacationRule implements GenerateRule {
 		}
 		
 		double result = 0;
-		double daysNumber = Utils.getDateDifference(startInterval, endInterval, TimeUnit.DAYS);
+		double daysNumber = getVacationDays(startInterval, endInterval);
 		for (StationEntity station:employeeStations) {
 			int availableEmployeesNumber = getAvailableEmployeesNumberForStationWithinInterval(station, startInterval, endInterval, allVacations);
-			result += (station.getCapacity() * daysNumber / availableEmployeesNumber);
+			result += (station.getCapacity() * daysNumber * 24 / availableEmployeesNumber);
 		}
 		return result;
 	}
@@ -132,7 +159,8 @@ public class VacationRule implements GenerateRule {
 		}
 		
 		int availableEmployeesNumber = 0;
-		for (EmployeeEntity employee:station.getEmployees()) {
+		Set<EmployeeEntity> employeesWorkingInStation = getEmployeesWorkingInStationForInterval(station, startInterval, endInterval);
+		for (EmployeeEntity employee:employeesWorkingInStation) {
 			List<RuleVacationEntity> employeeVacations = getVacationsOfEmployee(employee.getId(), allVacations);
 			if (!isEmployeeOnVacationBetweenInterval(employeeVacations, startInterval, endInterval)) {
 				availableEmployeesNumber ++;
@@ -141,12 +169,19 @@ public class VacationRule implements GenerateRule {
 		return availableEmployeesNumber;
 	}
 
+	private Set<EmployeeEntity> getEmployeesWorkingInStationForInterval(StationEntity station, Date startInterval, Date endInterval) {
+		// TODO Add also replacers
+		return station.getEmployees();
+	}
+
 	private boolean isEmployeeOnVacationBetweenInterval(List<RuleVacationEntity> employeeVacations, Date startInterval, Date endInterval) {
 		if (employeeVacations == null || startInterval == null || endInterval == null) {
 			return false;
 		}
 		for (RuleVacationEntity vacation:employeeVacations) {
-			if (vacation.getStart().before(startInterval) || vacation.getEnd().after(endInterval)) {
+			Date calcStart = Utils.getMaximum(startInterval, vacation.getStart());
+			Date calcEnd = Utils.getMinimum(endInterval, vacation.getEnd());
+			if (calcStart.after(calcEnd)) {
 				continue;
 			}
 			return true;

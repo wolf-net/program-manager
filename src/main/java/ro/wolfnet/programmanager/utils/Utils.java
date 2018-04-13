@@ -1,7 +1,9 @@
 package ro.wolfnet.programmanager.utils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -104,6 +106,53 @@ public class Utils {
       if (d1 == null) return d2;
       if (d2 == null) return d1;
       return (d1.before(d2)) ? d1 : d2;
+  }
+
+  public static List<Date> getDatesBetweenTwoDates(Date calcStart, Date calcEnd) {
+	List<Date> dates = new ArrayList<>();
+	if (calcStart == null || calcEnd == null || calcStart.after(calcEnd)) {
+		return dates;
+	}
+	Calendar cal = Calendar.getInstance();
+	cal.setTime(calcStart);
+	while (!cal.getTime().after(calcEnd)) {
+		dates.add(cal.getTime());
+		cal.add(Calendar.DAY_OF_MONTH, 1);
+	}
+	dates.add(cal.getTime());
+	return dates;
+  }
+
+  public static boolean areDatesContainDate(List<Date> dates, Date date) {
+	if (dates == null || date == null) {
+		return false;
+	}
+	
+	Calendar dateCal = Calendar.getInstance();
+	dateCal.setTime(date);
+	for (Date currentDate:dates) {
+		Calendar currentDateCal = Calendar.getInstance();
+		currentDateCal.setTime(currentDate);
+		if (dateCal.get(Calendar.YEAR) == currentDateCal.get(Calendar.YEAR) &&
+				dateCal.get(Calendar.DAY_OF_YEAR) == currentDateCal.get(Calendar.DAY_OF_YEAR)) {
+			return true;
+		}
+	}
+	return false;
+  }
+
+  public static Date getDateFromBeginningOfDay(Date date) {
+	if (date == null) {
+		return null;
+	}
+	
+	Calendar res = Calendar.getInstance();
+	res.setTime(date);
+	res.set(Calendar.HOUR_OF_DAY, 0);
+	res.set(Calendar.MINUTE, 0);
+	res.set(Calendar.SECOND, 0);
+	res.set(Calendar.MILLISECOND, 0);
+	return res.getTime();
   }
 
 }
