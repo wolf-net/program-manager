@@ -3,8 +3,10 @@ package ro.wolfnet.programmanager.service.generate;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,9 +17,14 @@ import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.entity.RuleVacationEntity;
 import ro.wolfnet.programmanager.entity.StationEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
+import ro.wolfnet.programmanager.repository.RuleRepository;
 import ro.wolfnet.programmanager.repository.StationRepository;
 import ro.wolfnet.programmanager.service.RuleService;
 import ro.wolfnet.programmanager.utils.Utils;
+
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * The Class VacationRule.
@@ -30,6 +37,9 @@ public class VacationRule implements GenerateRule {
 	
 	@Autowired
 	private StationRepository stationRepository;
+	
+	@Autowired
+	private RuleRepository ruleRepository;
 
   /* (non-Javadoc)
    * @see ro.wolfnet.programmanager.service.generate.GenerateRule#filterEmployees(long, java.util.Date, java.util.List, java.util.List)
@@ -170,8 +180,34 @@ public class VacationRule implements GenerateRule {
 	}
 
 	private Set<EmployeeEntity> getEmployeesWorkingInStationForInterval(StationEntity station, Date startInterval, Date endInterval) {
-		// TODO Add also replacers
-		return station.getEmployees();
+		List<RuleVacationEntity> vacations = ruleRepository.findActiveVacations(startInterval, endInterval);
+		if (vacations == null || vacations.size() == 0) {
+			return station.getEmployees();
+		}
+		
+		List<EmployeeEntity> replacers = new ArrayList<>();
+		for (RuleVacationEntity vacation:vacations) {
+			if (vacation.getReplacers() == null || vacation.getReplacers().size() == 0 || !doesEmployeeWorkInStation(vacation.getEmployees().iterator().next(), station)) {
+				continue;
+			}
+			replacers.addAll(vacation.getReplacers());
+		}
+		
+		replacers.addAll(station.getEmployees());
+		Set<EmployeeEntity> unique = replacers.stream().collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparingLong(EmployeeEntity::getId))), HashSet::new));
+		return unique;
+	}
+
+	private boolean doesEmployeeWorkInStation(EmployeeEntity employee, StationEntity station) {
+		if (employee == null || station == null || employee.getStations() == null) {
+			return false;
+		}
+		for (StationEntity employeeStation:employee.getStations()) {
+			if (station.getId() == employeeStation.getId()) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private boolean isEmployeeOnVacationBetweenInterval(List<RuleVacationEntity> employeeVacations, Date startInterval, Date endInterval) {
