@@ -192,7 +192,7 @@ public class VacationRule implements GenerateRule {
     if (calcStart == null || calcEnd == null || calcStart.after(calcEnd)) {
       return 0;
     }
-    long diff = Utils.getDateDifference(calcStart, calcEnd, TimeUnit.DAYS) + 1;
+    long diff = Utils.getDateDifference(calcStart, calcEnd, TimeUnit.DAYS);
     if (calcStart.getTime() != calcEnd.getTime()) {
       diff++;
     }
@@ -217,6 +217,7 @@ public class VacationRule implements GenerateRule {
     double result = 0;
     double daysNumber = getVacationDays(startInterval, endInterval);
     for (StationEntity station : employeeStations) {
+      //TODO: try to get work hours for every day, instead of getting for interval because vacations overlapped with interval
       int availableEmployeesNumber = getAvailableEmployeesNumberForStationWithinInterval(station, startInterval, endInterval, allVacations);
       result += (station.getCapacity() * daysNumber * 24 / availableEmployeesNumber);
     }
