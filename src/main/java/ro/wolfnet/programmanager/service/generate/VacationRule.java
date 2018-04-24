@@ -1,5 +1,9 @@
 package ro.wolfnet.programmanager.service.generate;
 
+import static java.util.Comparator.comparingLong;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -17,14 +21,9 @@ import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.entity.RuleVacationEntity;
 import ro.wolfnet.programmanager.entity.StationEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
-import ro.wolfnet.programmanager.repository.RuleRepository;
 import ro.wolfnet.programmanager.repository.StationRepository;
 import ro.wolfnet.programmanager.service.RuleService;
 import ro.wolfnet.programmanager.utils.Utils;
-
-import static java.util.Comparator.comparingLong;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toCollection;
 
 /**
  * The Class VacationRule.
@@ -38,10 +37,6 @@ public class VacationRule implements GenerateRule {
   /** The station repository. */
   @Autowired
   private StationRepository stationRepository;
-
-  /** The rule repository. */
-  @Autowired
-  private RuleRepository ruleRepository;
 
   /* (non-Javadoc)
    * @see ro.wolfnet.programmanager.service.generate.GenerateRule#filterEmployees(long, java.util.Date, java.util.List, java.util.List)
@@ -236,7 +231,7 @@ public class VacationRule implements GenerateRule {
    * Gets the available employees number for station within interval.
    *
    * @param station the station
-   * @param startInterval the start interval
+   * @param date the date
    * @param allVacations the all vacations
    * @return the available employees number for station within interval
    */
@@ -246,7 +241,7 @@ public class VacationRule implements GenerateRule {
     }
 
     int availableEmployeesNumber = 0;
-    Set<EmployeeEntity> employeesWorkingInStation = getEmployeesWorkingInStationForInterval(station, date);
+    Set<EmployeeEntity> employeesWorkingInStation = getEmployeesWorkingInStationForInterval(station, date, allVacations);
     for (EmployeeEntity employee : employeesWorkingInStation) {
       List<RuleVacationEntity> employeeVacations = getVacationsOfEmployee(employee.getId(), allVacations);
       if (!isEmployeeOnVacationOnSpecificDate(employeeVacations, date)) {
@@ -260,12 +255,12 @@ public class VacationRule implements GenerateRule {
    * Gets the employees working in station for interval.
    *
    * @param station the station
-   * @param startInterval the start interval
-   * @param endInterval the end interval
+   * @param date the date
+   * @param allVacations the all vacations
    * @return the employees working in station for interval
    */
-  private Set<EmployeeEntity> getEmployeesWorkingInStationForInterval(StationEntity station, Date date) {
-    List<RuleVacationEntity> vacations = ruleRepository.findActiveVacations(date);
+  private Set<EmployeeEntity> getEmployeesWorkingInStationForInterval(StationEntity station, Date date, List<RuleVacationEntity> allVacations) {
+    List<RuleVacationEntity> vacations = getActiveVacations(date, allVacations);
     if (vacations == null || vacations.size() == 0) {
       return station.getEmployees();
     }
@@ -283,6 +278,28 @@ public class VacationRule implements GenerateRule {
     Set<EmployeeEntity> unique = replacers.stream()
         .collect(collectingAndThen(toCollection(() -> new TreeSet<>(comparingLong(EmployeeEntity::getId))), HashSet::new));
     return unique;
+  }
+
+  /**
+   * Gets the active vacations.
+   *
+   * @param date the date
+   * @param allVacations the all vacations
+   * @return the active vacations
+   */
+  private List<RuleVacationEntity> getActiveVacations(Date date, List<RuleVacationEntity> allVacations) {
+    if (date == null || allVacations == null || allVacations.size() == 0) {
+      return null;
+    }
+
+    List<RuleVacationEntity> activeVacations = new ArrayList<>();
+    for (RuleVacationEntity vacation : allVacations) {
+      if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
+        continue;
+      }
+      activeVacations.add(vacation);
+    }
+    return activeVacations;
   }
 
   /**
@@ -308,8 +325,7 @@ public class VacationRule implements GenerateRule {
    * Checks if is employee on vacation between interval.
    *
    * @param employeeVacations the employee vacations
-   * @param startInterval the start interval
-   * @param endInterval the end interval
+   * @param date the date
    * @return true, if is employee on vacation between interval
    */
   private boolean isEmployeeOnVacationOnSpecificDate(List<RuleVacationEntity> employeeVacations, Date date) {
