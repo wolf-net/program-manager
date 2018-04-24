@@ -17,7 +17,7 @@ import ro.wolfnet.programmanager.entity.RuleVacationEntity;
  */
 public interface RuleRepository extends JpaRepository<RuleBaseEntity, Long> {
 	
-	@Query("SELECT r FROM RuleVacationEntity r WHERE r.start <= ?1 AND r.end >= ?2")
-	List<RuleVacationEntity> findActiveVacations(Date from, Date to);
+	@Query("SELECT r FROM RuleVacationEntity r WHERE r.start <= ?1 AND r.end >= ?1")
+	List<RuleVacationEntity> findActiveVacations(Date date);
 
 }

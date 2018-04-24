@@ -133,8 +133,9 @@ public class VacationRule implements GenerateRule {
   /**
    * Gets the aux worked hours.
    * 
-   * Rule: ((how many assigned stations I have * worked employees on each one / how many employees will work in this interval) - my vacation hours) /
-   * work days number * work day index * -1
+   * Rule: (((how many assigned stations I have * worked employees on each one / how many employees will work in this interval) - my vacation hours) /
+   * work days number * work day index * -1) + 
+   * worked hours for past vacations
    *
    * @param workDate the work date
    * @param employee the employee
@@ -149,6 +150,7 @@ public class VacationRule implements GenerateRule {
     }
 
     double workedHoursDifferenceBetweenMeAndOthers = 0;
+    double myVacationHoursInPast = 0;
     Date start = Utils.getDateFromBeginningOfMonth(workDate);
     Date end = Utils.getDateAtEndOfMonth(workDate);
     List<Date> vacationDays = new ArrayList<>();
@@ -162,6 +164,9 @@ public class VacationRule implements GenerateRule {
       double myVacationHours = getVacationDays(calcStart, calcEnd) * 8;
       double othersWorkedHours = getWorkedHoursOfOneEmployeeWithoutMe(employeeStations, calcStart, calcEnd, allVacations);
       workedHoursDifferenceBetweenMeAndOthers += (othersWorkedHours - myVacationHours);
+      if (calcEnd.before(workDate)) {
+        myVacationHoursInPast += myVacationHours;
+      }
       vacationDays.addAll(Utils.getDatesBetweenTwoDates(calcStart, calcEnd));
     }
 
@@ -178,7 +183,7 @@ public class VacationRule implements GenerateRule {
         workDayIndex++;
       }
     }
-    return workedHoursDifferenceBetweenMeAndOthers / totalWorkDaysThisMonth * workDayIndex * (-1);
+    return (workedHoursDifferenceBetweenMeAndOthers / totalWorkDaysThisMonth * workDayIndex * (-1)) + myVacationHoursInPast;
   }
 
   /**
@@ -215,11 +220,14 @@ public class VacationRule implements GenerateRule {
     }
 
     double result = 0;
-    double daysNumber = getVacationDays(startInterval, endInterval);
     for (StationEntity station : employeeStations) {
-      //TODO: try to get work hours for every day, instead of getting for interval because vacations overlapped with interval
-      int availableEmployeesNumber = getAvailableEmployeesNumberForStationWithinInterval(station, startInterval, endInterval, allVacations);
-      result += (station.getCapacity() * daysNumber * 24 / availableEmployeesNumber);
+      Calendar cal = Calendar.getInstance();
+      cal.setTime(startInterval);
+      while (!cal.getTime().after(endInterval)) {
+        int availableEmployeesNumber = getAvailableEmployeesNumberForStationForOneDay(station, cal.getTime(), allVacations);
+        result += (station.getCapacity() * 24 / availableEmployeesNumber);
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+      }
     }
     return result;
   }
@@ -229,21 +237,19 @@ public class VacationRule implements GenerateRule {
    *
    * @param station the station
    * @param startInterval the start interval
-   * @param endInterval the end interval
    * @param allVacations the all vacations
    * @return the available employees number for station within interval
    */
-  private int getAvailableEmployeesNumberForStationWithinInterval(StationEntity station, Date startInterval, Date endInterval,
-                                                                  List<RuleVacationEntity> allVacations) {
-    if (station == null || startInterval == null || endInterval == null) {
+  private int getAvailableEmployeesNumberForStationForOneDay(StationEntity station, Date date, List<RuleVacationEntity> allVacations) {
+    if (station == null || date == null) {
       return 0;
     }
 
     int availableEmployeesNumber = 0;
-    Set<EmployeeEntity> employeesWorkingInStation = getEmployeesWorkingInStationForInterval(station, startInterval, endInterval);
+    Set<EmployeeEntity> employeesWorkingInStation = getEmployeesWorkingInStationForInterval(station, date);
     for (EmployeeEntity employee : employeesWorkingInStation) {
       List<RuleVacationEntity> employeeVacations = getVacationsOfEmployee(employee.getId(), allVacations);
-      if (!isEmployeeOnVacationBetweenInterval(employeeVacations, startInterval, endInterval)) {
+      if (!isEmployeeOnVacationOnSpecificDate(employeeVacations, date)) {
         availableEmployeesNumber++;
       }
     }
@@ -258,8 +264,8 @@ public class VacationRule implements GenerateRule {
    * @param endInterval the end interval
    * @return the employees working in station for interval
    */
-  private Set<EmployeeEntity> getEmployeesWorkingInStationForInterval(StationEntity station, Date startInterval, Date endInterval) {
-    List<RuleVacationEntity> vacations = ruleRepository.findActiveVacations(startInterval, endInterval);
+  private Set<EmployeeEntity> getEmployeesWorkingInStationForInterval(StationEntity station, Date date) {
+    List<RuleVacationEntity> vacations = ruleRepository.findActiveVacations(date);
     if (vacations == null || vacations.size() == 0) {
       return station.getEmployees();
     }
@@ -306,13 +312,13 @@ public class VacationRule implements GenerateRule {
    * @param endInterval the end interval
    * @return true, if is employee on vacation between interval
    */
-  private boolean isEmployeeOnVacationBetweenInterval(List<RuleVacationEntity> employeeVacations, Date startInterval, Date endInterval) {
-    if (employeeVacations == null || startInterval == null || endInterval == null) {
+  private boolean isEmployeeOnVacationOnSpecificDate(List<RuleVacationEntity> employeeVacations, Date date) {
+    if (employeeVacations == null || date == null) {
       return false;
     }
     for (RuleVacationEntity vacation : employeeVacations) {
-      Date calcStart = Utils.getMaximum(startInterval, vacation.getStart());
-      Date calcEnd = Utils.getMinimum(endInterval, vacation.getEnd());
+      Date calcStart = Utils.getMaximum(date, vacation.getStart());
+      Date calcEnd = Utils.getMinimum(date, vacation.getEnd());
       if (calcStart.after(calcEnd)) {
         continue;
       }
