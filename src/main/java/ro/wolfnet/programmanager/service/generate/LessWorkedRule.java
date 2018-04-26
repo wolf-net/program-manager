@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
 
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
+import ro.wolfnet.programmanager.utils.Utils;
 
 /**
  * The Class LessWorkedRule.
@@ -29,6 +31,8 @@ public class LessWorkedRule implements GenerateRule {
       return null;
     }
 
+    employees = equalizeWorkedHourMinusesForWholeMonth(date, employees);
+
     Collections.sort(employees, new Comparator<EmployeeStatusModel>() {
       @Override
       public int compare(EmployeeStatusModel o1, EmployeeStatusModel o2) {
@@ -42,6 +46,66 @@ public class LessWorkedRule implements GenerateRule {
 
     int lastIdx = getLastWorkedIndex(employees);
     return employees.subList(0, lastIdx);
+  }
+
+  /**
+   * Equalize worked hour minuses for whole month.
+   *
+   * @param date the date
+   * @param employees the employees
+   * @return the list
+   */
+  private List<EmployeeStatusModel> equalizeWorkedHourMinusesForWholeMonth(Date date, List<EmployeeStatusModel> employees) {
+    if (date == null || employees == null || employees.size() == 0) {
+      return employees;
+    }
+
+    Date start = Utils.getDateFromBeginningOfMonth(date);
+    Date end = Utils.getDateAtEndOfMonth(date);
+    long numberOfTotalWorkDays = getVacationDays(start, end);
+    long numberOfLeftWorkDays = getVacationDays(date, end);
+    double maxWorkedHours = getMaximumOlderWorkedHours(employees);
+    for (int i = 0; i < employees.size(); i++) {
+      EmployeeStatusModel employee = employees.get(i);
+      double differenceBetweenMeAndMax = maxWorkedHours - employee.getOlderWorkedHours();
+      double auxWorkedHours = differenceBetweenMeAndMax / numberOfTotalWorkDays * numberOfLeftWorkDays;
+      employee.setWorkedHours(employee.getWorkedHours() + auxWorkedHours);
+    }
+
+    return employees;
+  }
+
+  /**
+   * Gets the maximum older worked hours.
+   *
+   * @param employees the employees
+   * @return the maximum older worked hours
+   */
+  private double getMaximumOlderWorkedHours(List<EmployeeStatusModel> employees) {
+    if (employees == null || employees.size() == 0) {
+      return 0;
+    }
+
+    EmployeeStatusModel maxOldWorkedEmployee = Collections.max(employees, Comparator.comparing(e -> e.getOlderWorkedHours()));
+    return maxOldWorkedEmployee.getOlderWorkedHours();
+  }
+
+  /**
+   * Gets the vacation days.
+   *
+   * @param calcStart the calc start
+   * @param calcEnd the calc end
+   * @return the vacation days
+   */
+  private long getVacationDays(Date calcStart, Date calcEnd) {
+    if (calcStart == null || calcEnd == null || calcStart.after(calcEnd)) {
+      return 0;
+    }
+    long diff = Utils.getDateDifference(calcStart, calcEnd, TimeUnit.DAYS);
+    if (calcStart.getTime() != calcEnd.getTime()) {
+      diff++;
+    }
+    return diff;
   }
 
   /**

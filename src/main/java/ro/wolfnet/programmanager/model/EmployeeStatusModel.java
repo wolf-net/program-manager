@@ -13,6 +13,9 @@ public class EmployeeStatusModel extends EmployeeModel {
   /** The worked hours. */
   private double workedHours;
 
+  /** The older worked hours. */
+  private double olderWorkedHours;
+
   /** The last worked. */
   private Date lastWorked;
 
@@ -31,6 +34,7 @@ public class EmployeeStatusModel extends EmployeeModel {
     this((EmployeeModel) employeeStatusModel);
     this.setLastWorked(employeeStatusModel.getLastWorked());
     this.setWorkedHours(employeeStatusModel.getWorkedHours());
+    this.setOlderWorkedHours(employeeStatusModel.getOlderWorkedHours());
   }
 
   /**
@@ -82,6 +86,24 @@ public class EmployeeStatusModel extends EmployeeModel {
    */
   public void setLastWorked(Date lastWorked) {
     this.lastWorked = lastWorked;
+  }
+
+  /**
+   * Gets the older worked hours.
+   *
+   * @return the older worked hours
+   */
+  public double getOlderWorkedHours() {
+    return olderWorkedHours;
+  }
+
+  /**
+   * Sets the older worked hours.
+   *
+   * @param olderWorkedHours the new older worked hours
+   */
+  public void setOlderWorkedHours(double olderWorkedHours) {
+    this.olderWorkedHours = olderWorkedHours;
   }
 
 }

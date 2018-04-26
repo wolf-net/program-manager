@@ -126,7 +126,7 @@ public class ProgramService {
 
     List<StationModel> allStations = stationService.findAll();
     List<RuleBaseEntity> rules = ruleService.findRuleEntities();
-    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses(dayOfProgram);
     List<ProgramEntity> programsForDay = null;
     for (long generateStartMillis = System.currentTimeMillis(); programsForDay == null;) {
       programsForDay = getProgramsForOneDay(dayOfProgram, allStations, copyEmployeeList(allEmployees), rules);
@@ -249,7 +249,7 @@ public class ProgramService {
 
     List<StationModel> allStations = stationService.findAll();
     List<RuleBaseEntity> rules = ruleService.findRuleEntities();
-    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses();
+    List<EmployeeStatusModel> allEmployees = employeeService.findEmployeeStatuses(monthDay);
     List<ProgramEntity> programsForMonth = new ArrayList<>();
     long generateStartMillis = System.currentTimeMillis();
     for (Date date : datesOfMonth) {
