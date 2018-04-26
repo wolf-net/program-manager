@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.ProgramEntity;
-import ro.wolfnet.programmanager.entity.RuleVacationEntity;
 import ro.wolfnet.programmanager.model.EmployeeModel;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.repository.EmployeeRepository;
@@ -36,9 +35,6 @@ public class EmployeeService {
   /** The station service. */
   @Autowired
   private StationService stationService;
-  
-  @Autowired
-  private RuleService ruleService;
 
   /**
    * Find all.
@@ -178,11 +174,10 @@ public class EmployeeService {
   public List<EmployeeStatusModel> findEmployeeStatuses(Date monthDay) {
     List<EmployeeModel> employees = this.findAll();
     List<ProgramEntity> programs = programRepository.findAll();
-    List<RuleVacationEntity> vacations = RuleService.filterVacationFromBaseRules(ruleService.findRuleEntities());
     List<EmployeeStatusModel> employeeStatuses = new ArrayList<>();
     for (EmployeeModel employee : employees) {
       EmployeeStatusModel employeeStatus = new EmployeeStatusModel(employee);
-      int[] workedHours = getWorkedHoursOfEmployeeFromPrograms(employee, programs, vacations, monthDay);
+      int[] workedHours = getWorkedHoursOfEmployeeFromPrograms(employee, programs, monthDay);
       employeeStatus.setWorkedHours(workedHours[0]);
       employeeStatus.setOlderWorkedHours(workedHours[1]);
       employeeStatus.setLastWorked(getLastWorkedFromPrograms(employee, programs));
@@ -213,6 +208,10 @@ public class EmployeeService {
 
   /**
    * Gets the worked hours of employee from programs.
+   * 
+   * Vacation worked hours will be included in vacation rules business.
+   * 
+   * Include also feature hours because than in present employee should work less.
    *
    * @param employee the employee
    * @param programs the programs
@@ -220,21 +219,21 @@ public class EmployeeService {
    * @param generateForDay the month day
    * @return the worked hours of employee from programs
    */
-  
-  //@TODO: include also vacations in worked hours
-  //@TODO: include only past/this month programs and vacations
-  private int[] getWorkedHoursOfEmployeeFromPrograms(EmployeeModel employee, List<ProgramEntity> programs, List<RuleVacationEntity> vacations, Date generateForDay) {
+  private int[] getWorkedHoursOfEmployeeFromPrograms(EmployeeModel employee, List<ProgramEntity> programs, Date generateForDay) {
     int[] workedHours = { 0, 0 };
+    if (programs == null || programs.size() == 0) {
+      return workedHours;
+    }
+
     Date startOfMonthDay = Utils.getDateFromBeginningOfMonth(generateForDay);
     for (ProgramEntity program : programs) {
       if (program.getEmployee().getId() != employee.getId()) {
         continue;
       }
-      
+
       if (program.getDate().before(startOfMonthDay)) {
         workedHours[1] += program.getWorkedHours();
       }
-      
       workedHours[0] += program.getWorkedHours();
     }
     return workedHours;
