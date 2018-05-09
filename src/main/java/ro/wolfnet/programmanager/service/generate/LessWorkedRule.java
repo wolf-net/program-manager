@@ -67,9 +67,13 @@ public class LessWorkedRule implements GenerateRule {
     double maxWorkedHours = getMaximumOlderWorkedHours(employees);
     for (int i = 0; i < employees.size(); i++) {
       EmployeeStatusModel employee = employees.get(i);
+      if (employee.isWorkedHoursEqualized()) {
+        continue;
+      }
       double differenceBetweenMeAndMax = maxWorkedHours - employee.getOlderWorkedHours();
       double auxWorkedHours = differenceBetweenMeAndMax / numberOfTotalWorkDays * numberOfLeftWorkDays;
       employee.setWorkedHours(employee.getWorkedHours() + auxWorkedHours);
+      employee.setWorkedHoursEqualized(true);
     }
 
     return employees;

@@ -19,6 +19,9 @@ public class EmployeeStatusModel extends EmployeeModel {
   /** The last worked. */
   private Date lastWorked;
 
+  /** The worked hours equalized. */
+  private boolean workedHoursEqualized;
+
   /**
    * Instantiates a new employee status model.
    */
@@ -104,6 +107,24 @@ public class EmployeeStatusModel extends EmployeeModel {
    */
   public void setOlderWorkedHours(double olderWorkedHours) {
     this.olderWorkedHours = olderWorkedHours;
+  }
+
+  /**
+   * Checks if is worked hours equalized.
+   *
+   * @return true, if is worked hours equalized
+   */
+  public boolean isWorkedHoursEqualized() {
+    return workedHoursEqualized;
+  }
+
+  /**
+   * Sets the worked hours equalized.
+   *
+   * @param workedHoursEqualized the new worked hours equalized
+   */
+  public void setWorkedHoursEqualized(boolean workedHoursEqualized) {
+    this.workedHoursEqualized = workedHoursEqualized;
   }
 
 }
