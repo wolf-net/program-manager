@@ -14,6 +14,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class Utils {
 
+  public static final int EXPORT_COLUMN_WORKED = 1;
+  public static final int EXPORT_COLUMN_VACATION = 2;
+  public static final int EXPORT_COLUMN_TOTAL = 3;
+
   /**
    * Gets the int attribute.
    *

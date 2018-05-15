@@ -4,6 +4,7 @@ $(document).ready(function() {
 	loadRules();
 	loadEmployees();
 	loadStations();
+	loadSettings();
 });
 
 function goToSection(elem, sectionId) {
@@ -179,9 +180,27 @@ function designSelect2Input(jInput) {
 	
 }
 
+function loadSettings() {
+	$.ajax({
+		method: "GET",
+		url: "settings"
+	}).done(function(response) {
+	    $(response.exportColumns).each(function() {
+	    	$('#section-5 [name="export-columns"][value="' + this + '"]').attr('checked', 'checked');
+	    });
+	});
+}
+
 function saveSettings() {
+	var exportColumns = [];
+    $('#section-5 [name="export-columns"]:checked').each(function() {
+    	exportColumns.push($(this).val());
+    });
+    
 	var markers = {
-		newPassword: $('#section-5 #new-password').val()
+		newPassword: $('#section-5 #new-password').val(),
+		deleteOlder: $('#section-5 #delete-older').val(),
+		exportColumns: exportColumns
 	};
 	$.ajax({
 		url: "settings",

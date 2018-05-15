@@ -5,11 +5,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
@@ -41,9 +43,11 @@ import ro.wolfnet.programmanager.entity.RuleVacationEntity;
 import ro.wolfnet.programmanager.model.EmployeeModel;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
+import ro.wolfnet.programmanager.model.SettingsModel;
 import ro.wolfnet.programmanager.model.StationModel;
 import ro.wolfnet.programmanager.repository.ProgramRepository;
 import ro.wolfnet.programmanager.utils.IncompatibleRulesException;
+import ro.wolfnet.programmanager.utils.Utils;
 
 /**
  * The Class ProgramService.
@@ -66,9 +70,13 @@ public class ProgramService {
   @Autowired
   private EmployeeService employeeService;
 
+  /** The rule service. */
   @Autowired
   private RuleService ruleService;
-  
+
+  @Autowired
+  private UserService userService;
+
   /**
    * Insert dummy.
    */
@@ -163,9 +171,11 @@ public class ProgramService {
    * @param dayOfProgram the day of program
    * @param allStations the all stations
    * @param allEmployees the all employees
+   * @param rules the rules
    * @return the programs for one day
    */
-  private List<ProgramEntity> getProgramsForOneDay(Date dayOfProgram, List<StationModel> allStations, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) {
+  private List<ProgramEntity> getProgramsForOneDay(Date dayOfProgram, List<StationModel> allStations, List<EmployeeStatusModel> allEmployees,
+                                                   List<RuleBaseEntity> rules) {
     try {
       List<ProgramEntity> programsForDay = new ArrayList<>();
       for (StationModel station : allStations) {
@@ -185,10 +195,12 @@ public class ProgramService {
    * @param station the station
    * @param date the date
    * @param allEmployees the all employees
+   * @param rules the rules
    * @return the programs for station
    * @throws IncompatibleRulesException the incompatible rules exception
    */
-  private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) throws IncompatibleRulesException {
+  private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeStatusModel> allEmployees,
+                                                    List<RuleBaseEntity> rules) throws IncompatibleRulesException {
     if (station == null || station.getCapacity() == 0) {
       throw new IncompatibleRulesException();
     }
@@ -207,16 +219,19 @@ public class ProgramService {
     }
     return newPrograms;
   }
-  
+
   /**
    * Gets the random employee model from list.
    *
    * @param stationId the station id
-   * @param filteredEmployees the all employees
+   * @param date the date
+   * @param allEmployees the all employees
+   * @param rules the rules
    * @return the random employee model from list
    * @throws IncompatibleRulesException the incompatible rules exception
    */
-  private EmployeeStatusModel getRandomEmployeeModelFromList(long stationId, Date date, List<EmployeeStatusModel> allEmployees, List<RuleBaseEntity> rules) throws IncompatibleRulesException {
+  private EmployeeStatusModel getRandomEmployeeModelFromList(long stationId, Date date, List<EmployeeStatusModel> allEmployees,
+                                                             List<RuleBaseEntity> rules) throws IncompatibleRulesException {
     List<EmployeeStatusModel> filteredEmployees = ruleService.filterEmployeesByRules(stationId, date, allEmployees, rules);
     if (filteredEmployees == null || filteredEmployees.size() == 0) {
       throw new IncompatibleRulesException();
@@ -335,19 +350,21 @@ public class ProgramService {
    * Export program for one month.
    *
    * @param dayOfProgram the day of program
+   * @param userName the user name
    * @return the input stream
    * @throws Exception the exception
    */
-  public InputStream exportProgramForOneMonth(Date dayOfProgram) throws Exception {
+  public InputStream exportProgramForOneMonth(Date dayOfProgram, String userName) throws Exception {
+    SettingsModel settings = userService.getSettings(userName);
     XWPFDocument document = new XWPFDocument();
-    
+
     CTSectPr sectPr = document.getDocument().getBody().addNewSectPr();
     CTPageMar pageMar = sectPr.addNewPgMar();
     pageMar.setLeft(BigInteger.valueOf(720L));
     pageMar.setTop(BigInteger.valueOf(720L));
     pageMar.setRight(BigInteger.valueOf(720L));
     pageMar.setBottom(BigInteger.valueOf(720L));
-    
+
     XWPFTable table = document.createTable();
     CTBody body = document.getDocument().getBody();
     if (!body.isSetSectPr()) {
@@ -374,7 +391,7 @@ public class ProgramService {
     tblW.setW(BigInteger.valueOf(5000));
     tblW.setType(STTblWidth.PCT);
 
-    addProgramsOfMonthToTable(dayOfProgram, table);
+    addProgramsOfMonthToTable(dayOfProgram, table, settings.getExportColumns());
 
     ByteArrayOutputStream baos = new ByteArrayOutputStream();
     document.write(baos);
@@ -388,16 +405,21 @@ public class ProgramService {
    *
    * @param dayOfProgram the day of program
    * @param table the table
+   * @param exportColumns 
    */
-  private void addProgramsOfMonthToTable(Date dayOfProgram, XWPFTable table) {
+  private void addProgramsOfMonthToTable(Date dayOfProgram, XWPFTable table, int[] exportColumns) {
     XWPFTableRow row = table.createRow();
     row.getCell(0).setText("");
 
+    Map<Long, Integer> employeeTotalHours = new HashMap<>();
     Map<Long, Integer> employeeWorkedHours = new HashMap<>();
+    Map<Long, Integer> employeeVacationHours = new HashMap<>();
     List<EmployeeModel> employees = employeeService.findAll();
     for (EmployeeModel employee : employees) {
       row = table.createRow();
+      employeeTotalHours.put(employee.getId(), 0);
       employeeWorkedHours.put(employee.getId(), 0);
+      employeeVacationHours.put(employee.getId(), 0);
       row.getCell(0).setText(employee.getName());
       allignVerticalToMiddle(row.getCell(0));
     }
@@ -418,54 +440,99 @@ public class ProgramService {
         if (idx > -1) {
           ProgramEntity programEntity = programs.get(idx);
           long foundEmployeeId = programEntity.getEmployee().getId();
+          employeeTotalHours.put(foundEmployeeId, employeeTotalHours.get(foundEmployeeId) + programEntity.getWorkedHours());
           employeeWorkedHours.put(foundEmployeeId, employeeWorkedHours.get(foundEmployeeId) + programEntity.getWorkedHours());
           text = programEntity.getStation().getName();
         }
         else if (isEmployeeOnVacation(employees.get(i).getId(), date, vacations)) {
-          employeeWorkedHours.put(employees.get(i).getId(), employeeWorkedHours.get(employees.get(i).getId()) + 8);
-        	text = "x";
+          employeeTotalHours.put(employees.get(i).getId(), employeeTotalHours.get(employees.get(i).getId()) + 8);
+          employeeVacationHours.put(employees.get(i).getId(), employeeVacationHours.get(employees.get(i).getId()) + 8);
+          text = "x";
         }
         addTextToCell(row.addNewTableCell(), text, weekend);
       }
     }
 
-    for (int i = 0; i < employees.size(); i++) {
-      row = table.getRows().get(i + 2);
-      long employeeId = employees.get(i).getId();
-      addTextToCell(row.addNewTableCell(), employeeWorkedHours.get(employeeId) + "", false);
+    if (exportColumns != null) {
+      List<Integer> exportColumnsList = Arrays.stream(exportColumns).boxed().collect(Collectors.toList());
+      if (exportColumnsList.contains(Utils.EXPORT_COLUMN_WORKED)) {
+        row = table.getRows().get(1);
+        addTextToCell(row.addNewTableCell(), "W", false);
+        
+        for (int i = 0; i < employees.size(); i++) {
+          row = table.getRows().get(i + 2);
+          long employeeId = employees.get(i).getId();
+          addTextToCell(row.addNewTableCell(), employeeWorkedHours.get(employeeId) + "", false);
+        }
+      }
+      
+      if (exportColumnsList.contains(Utils.EXPORT_COLUMN_VACATION)) {
+        row = table.getRows().get(1);
+        addTextToCell(row.addNewTableCell(), "V", false);
+        
+        for (int i = 0; i < employees.size(); i++) {
+          row = table.getRows().get(i + 2);
+          long employeeId = employees.get(i).getId();
+          addTextToCell(row.addNewTableCell(), employeeVacationHours.get(employeeId) + "", false);
+        }
+      }
+
+      if (exportColumnsList.contains(Utils.EXPORT_COLUMN_TOTAL)) {
+        row = table.getRows().get(1);
+        addTextToCell(row.addNewTableCell(), "T", false);
+        
+        for (int i = 0; i < employees.size(); i++) {
+          row = table.getRows().get(i + 2);
+          long employeeId = employees.get(i).getId();
+          addTextToCell(row.addNewTableCell(), employeeTotalHours.get(employeeId) + "", false);
+        }
+      }
     }
   }
 
+  /**
+   * Allign vertical to middle.
+   *
+   * @param cell the cell
+   */
   private void allignVerticalToMiddle(XWPFTableCell cell) {
-      cell.setVerticalAlignment(XWPFVertAlign.CENTER);
-      XWPFParagraph para = cell.getParagraphArray(0);
-      CTPPr ppr = para.getCTP().getPPr();
-      if (ppr == null) {
-    	  ppr = para.getCTP().addNewPPr();
-      }
-      CTSpacing spacing = ppr.isSetSpacing()? ppr.getSpacing() : ppr.addNewSpacing();
-      spacing.setAfter(BigInteger.valueOf(0));
-      spacing.setBefore(BigInteger.valueOf(0));
-      spacing.setLineRule(STLineSpacingRule.AUTO);
-      spacing.setLine(BigInteger.valueOf(240));
-}
-
-private boolean isEmployeeOnVacation(long employeeId, Date date, List<RuleVacationEntity> vacations) {
-	  if (vacations == null) {
-		  return false;
-	  }
-	for (RuleVacationEntity vacation:vacations) {
-		if (vacation.getEmployees().iterator().next().getId() == employeeId) {
-			if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
-				continue;
-			}
-			return true;
-		}
-	}
-	return false;
+    cell.setVerticalAlignment(XWPFVertAlign.CENTER);
+    XWPFParagraph para = cell.getParagraphArray(0);
+    CTPPr ppr = para.getCTP().getPPr();
+    if (ppr == null) {
+      ppr = para.getCTP().addNewPPr();
+    }
+    CTSpacing spacing = ppr.isSetSpacing() ? ppr.getSpacing() : ppr.addNewSpacing();
+    spacing.setAfter(BigInteger.valueOf(0));
+    spacing.setBefore(BigInteger.valueOf(0));
+    spacing.setLineRule(STLineSpacingRule.AUTO);
+    spacing.setLine(BigInteger.valueOf(240));
   }
 
-/**
+  /**
+   * Checks if is employee on vacation.
+   *
+   * @param employeeId the employee id
+   * @param date the date
+   * @param vacations the vacations
+   * @return true, if is employee on vacation
+   */
+  private boolean isEmployeeOnVacation(long employeeId, Date date, List<RuleVacationEntity> vacations) {
+    if (vacations == null) {
+      return false;
+    }
+    for (RuleVacationEntity vacation : vacations) {
+      if (vacation.getEmployees().iterator().next().getId() == employeeId) {
+        if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
+          continue;
+        }
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Checks if is day in weekend.
    *
    * @param date the date
@@ -505,6 +572,19 @@ private boolean isEmployeeOnVacation(long employeeId, Date date, List<RuleVacati
     Calendar cal = Calendar.getInstance();
     cal.setTime(date);
     return cal.get(Calendar.DAY_OF_MONTH) + "";
+  }
+
+  /**
+   * Delete older equal than.
+   *
+   * @param date the date
+   */
+  public void deleteOlderEqualThan(Date date) {
+    if (date == null) {
+      return;
+    }
+
+    programRepository.deleteByDateOlderEqual(date);
   }
 
 }

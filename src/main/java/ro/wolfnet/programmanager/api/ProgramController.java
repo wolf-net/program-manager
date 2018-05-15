@@ -1,6 +1,7 @@
 package ro.wolfnet.programmanager.api;
 
 import java.io.InputStream;
+import java.security.Principal;
 import java.util.Date;
 import java.util.List;
 
@@ -84,9 +85,9 @@ public class ProgramController {
    * @param response the response
    */
   @RequestMapping(value = "/generateProgramMonth", method = RequestMethod.GET)
-  public void exportProgramsForOneMonth(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayOfProgram,
-                                        HttpServletResponse response) throws Exception {
-    InputStream is = programService.exportProgramForOneMonth(dayOfProgram);
+  public void exportProgramsForOneMonth(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date dayOfProgram, HttpServletResponse response,
+                                        Principal principal) throws Exception {
+    InputStream is = programService.exportProgramForOneMonth(dayOfProgram, principal.getName());
     IOUtils.copy(is, response.getOutputStream());
     response.flushBuffer();
   }

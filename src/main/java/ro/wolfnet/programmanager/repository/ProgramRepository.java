@@ -37,4 +37,14 @@ public interface ProgramRepository extends JpaRepository<ProgramEntity, Long> {
   @Transactional
   @Query("DELETE FROM ProgramEntity p where p.date = :date")
   void deleteByDate(@Param("date") Date date);
+
+  /**
+   * Delete by date.
+   *
+   * @param date the date
+   */
+  @Modifying
+  @Transactional
+  @Query("DELETE FROM ProgramEntity p where p.date = :date or p.date < :date")
+  void deleteByDateOlderEqual(@Param("date") Date date);
 }
