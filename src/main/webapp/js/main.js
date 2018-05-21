@@ -322,8 +322,8 @@ function loadProgramsForDay(date) {
 	$.ajax({
 		url: "programDay?dayOfProgram=" + dateInput,
 		method: "GET"
-	}).done(function(response) {
-		$(response).each(function(index, element) {
+	}).done(function(programs) {
+		$(programs).each(function(index, element) {
 			var employeesList = '';
 			$(element.employees).each(function(index, element) {
 				employeesList += ' <li class="' + element.type + '">' + element.name + '</li>';
@@ -337,6 +337,28 @@ function loadProgramsForDay(date) {
 				'	</ol>' +
 				'</div>';
 			$('#day-programs').append(programContent);
+		});
+		
+		$.ajax({
+			method: "GET",
+			url: "station"
+		}).done(function(stations) {
+			if (stations == null || stations.length == programs.length) {
+				return;
+			}
+			
+			var programContent = 
+				'<div class="card">' + 
+				'	<div class="card-buttons">' +	
+				'		<i class="fa fa-save" onclick="saveStation(this)"></i>' +  
+				'	</div>' +
+				'	<div class="card-content">' +	
+				' 	<form id="new-station">' +
+				'		<select name="station-input" multiple="multiple" /> ' +
+				'	</form>' +
+				'</div>';
+			$('#day-programs').append(programContent);
+			initializeStationInput($('#day-programs .card [name="station-input"]'));
 		});
 	});
 }
