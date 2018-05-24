@@ -1,6 +1,7 @@
 package ro.wolfnet.programmanager.service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,8 +110,8 @@ public class StationService {
     }
 
     Set<StationEntity> result = new HashSet<>();
-    for (long stationId:stations) {
-    	result.add(getEntityFromParams(stationId));
+    for (long stationId : stations) {
+      result.add(getEntityFromParams(stationId));
     }
     return result;
   }
@@ -151,8 +152,50 @@ public class StationService {
     if (stations == null) {
       return null;
     }
- 
+
     return stations.stream().map(station -> station.getId()).mapToLong(Long::longValue).toArray();
+  }
+
+  /**
+   * Count.
+   *
+   * @return the long
+   */
+  public Long count() {
+    return stationRepository.count();
+  }
+
+  /**
+   * Gets the capacity for station id.
+   *
+   * @param stationId the station id
+   * @return the capacity for station id
+   */
+  public Integer getCapacityForStationId(long stationId) {
+    StationEntity station = stationRepository.findOne(stationId);
+    if (station == null) {
+      return null;
+    }
+    return station.getCapacity();
+  }
+
+  /**
+   * Filter stations.
+   *
+   * @param filterDateWithoutProgram the filter date without program
+   * @return the list
+   */
+  public List<StationModel> filterStations(Date filterDateWithoutProgram) {
+    List<StationEntity> entities = null;
+    if (filterDateWithoutProgram == null) {
+      entities = this.stationRepository.findAll();
+    }
+    else {
+      entities = this.stationRepository.filterByDateWithoutProgram(filterDateWithoutProgram);
+    }
+
+    List<StationModel> models = getModelsFromEntityes(entities);
+    return models;
   }
 
 }

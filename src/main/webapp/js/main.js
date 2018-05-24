@@ -126,10 +126,15 @@ function loadEmployees() {
 	});
 }
 
-function initializeStationInput(jInput) {
+function initializeStationInput(jInput, filterDateWithoutProgram) {
+	var url = "station?p=v";
+	if (filterDateWithoutProgram != undefined && filterDateWithoutProgram != null) {
+		url += "&filterDateWithoutProgram=" + filterDateWithoutProgram;
+	}
+	
 	$.ajax({
 		method: "GET",
-		url: "station"
+		url: url
 	}).done(function(response) {
 		results = $.map(response, function(station) {
 			return {
@@ -147,10 +152,18 @@ function initializeStationInput(jInput) {
 	});
 }
 
-function initializeEmployeeInput(jInput) {
+function initializeEmployeeInput(jInput, filterStationId, filterDate) {
+	var url = "employee?p=v";
+	if (filterStationId != undefined && filterStationId != null) {
+		url += "&filterStationId=" + filterStationId;
+	}
+	if (filterDate != undefined && filterDate != null) {
+		url += "&filterDate=" + filterDate;
+	}
+	
 	$.ajax({
 		method: "GET",
-		url: "employee"
+		url: url
 	}).done(function(response) {
 		results = $.map(response, function(employee) {
 			return {
@@ -312,7 +325,8 @@ function loadPrograms() {
 function loadProgramsForDay(date) {
 	var dateInput = formatDate(date);
 	var dateDisplay = displayDate(date);
-	
+
+	$('#day-programs .card').remove();
 	$('#day-programs .day-program').remove();
 	$('#calendar-programs').hide();
 	$('#day-programs').show();
@@ -326,40 +340,132 @@ function loadProgramsForDay(date) {
 		$(programs).each(function(index, element) {
 			var employeesList = '';
 			$(element.employees).each(function(index, element) {
-				employeesList += ' <li class="' + element.type + '">' + element.name + '</li>';
+				employeesList += 
+					' <li class="' + element.type + '">' + 
+			        ' 		<input type="hidden" name="employeeId" value="' + element.id + '"/> ' +
+							element.name + 
+					'</li>';
 			});
 			
 			var programContent = 
-				'<div class="day-program">' +
-		        '	<div class="station">' + element.stationName + '</div>' +
-				'	<ol class="employees">' +
+				'<div class="card day-program">' +
+				' 	<div class="card-buttons">' +
+				'		<i class="fa fa-edit" onclick="editProgramManually(this)"></i>' +
+				'	</div>' +
+				'	<div class="card-content">' +
+		        '		<div class="station">' + 
+		        '			<input type="hidden" name="stationId" value="' + element.stationId + '"/>' +
+		        			element.stationName + 
+    			'		</div>' +
+				'		<ol class="employees">' +
 				employeesList +
-				'	</ol>' +
+				'		</ol>' +
+				'	</div>' +
 				'</div>';
 			$('#day-programs').append(programContent);
 		});
 		
 		$.ajax({
 			method: "GET",
-			url: "station"
-		}).done(function(stations) {
-			if (stations == null || stations.length == programs.length) {
+			url: "stationCount"
+		}).done(function(stationsCount) {
+			if (stationsCount == programs.length) {
 				return;
 			}
 			
 			var programContent = 
 				'<div class="card">' + 
 				'	<div class="card-buttons">' +	
-				'		<i class="fa fa-save" onclick="saveStation(this)"></i>' +  
+				'		<i class="fa fa-save" onclick="programSaveStation(this)"></i>' +  
 				'	</div>' +
 				'	<div class="card-content">' +	
-				' 	<form id="new-station">' +
-				'		<select name="station-input" multiple="multiple" /> ' +
+				' 	<form id="new-program">' +
+				'		<input name="stationId" onchange="programEditStationChanged(this)" /> ' +
 				'	</form>' +
 				'</div>';
 			$('#day-programs').append(programContent);
-			initializeStationInput($('#day-programs .card [name="station-input"]'));
+			initializeStationInput($('#new-program [name="stationId"]'), $('#day-programs #calendar-curr-date').val());
 		});
+	});
+}
+
+function editProgramManually(editButton) {
+	var jEditButton = $(editButton);
+	var jContent = jEditButton.parents('.day-program').find('.card-content');
+	var date = $('#day-programs #calendar-curr-date').val();
+	var stationId = jContent.find('input[name="stationId"]').val();
+	jContent.append('<form id="new-program"></form>');
+	jContent.find('ol.employees li').each(function() {
+		jContent.find('#new-program').append('<input name="employee" value="' + $(this).find('[name="employeeId"]').val() + '" />');
+	}).remove();
+
+	initializeEmployeeInput(jContent.find('#new-program [name="employee"]'), stationId, date);
+	jEditButton.after('<br/><br/><i class="fa fa-undo" onclick="loadProgramsForDay(\'' + date + '\')"></i>');
+	jEditButton.replaceWith('<i class="fa fa-save" onclick="programSaveStation(this)"></i>');
+	jContent.after('<div class="card-buttons"><i class="fa fa-trash-o" onclick="programDeleteStation(this)"></i></div>');
+}
+
+function programDeleteStation(deleteButton) {
+	var stationId = jQuery(deleteButton).parents('.card').find('[name="stationId"]').val();
+	var date = $('#day-programs #calendar-curr-date').val();
+
+	$.ajax({
+		url: "programDay?stationId=" + stationId + '&dayOfProgram=' + date,
+		method: "DELETE"
+	}).always(function() {
+		loadProgramsForDay(date);
+	});
+}
+
+function programEditStationChanged(select) {
+	var jContent = $(select).parents('.card-content');
+	jContent.find('#new-program [name="employee"]').next('.select2-container').remove();
+	jContent.find('#new-program [name="employee"]').remove();
+	var stationId = $(select).val();
+	
+	$.ajax({
+		async: false,
+		method: "GET",
+		url: "stationCapacity?stationId=" + stationId
+	}).done(function(stationsCount) {
+		if (stationsCount == null) {
+			return;
+		}
+		
+		for (var i=0; i<stationsCount; i++) {
+			jContent.find('#new-program').append('<input name="employee" />');
+		}
+	});
+	
+	initializeEmployeeInput(jContent.find('#new-program [name="employee"]'), stationId, $('#day-programs #calendar-curr-date').val());
+}
+
+function programSaveStation(saveButton) {
+	var jContent = $(saveButton).parents('.card');
+	var date = $('#day-programs #calendar-curr-date').val();
+	var employees = [];
+	jContent.find('input[name="employee"]').each(function() {
+		employees.push({id:$(this).val()});
+	});
+	
+	var markers = {
+		stationId: jContent.find('input[name="stationId"]').val(),
+		date: date,
+		employees: employees
+	};
+	
+	$.ajax({
+		url: "programManually",
+		method: "POST",
+		dataType: "jsonp",
+        contentType: "application/json",
+		data: JSON.stringify(markers),
+	}).always(function(response) {
+		if (response.status != 200) {
+			alert(response.responseText);
+		}else{
+			loadProgramsForDay(date);
+		}
 	});
 }
 

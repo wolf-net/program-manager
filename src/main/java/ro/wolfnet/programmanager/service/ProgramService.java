@@ -36,10 +36,13 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.STPageOrientation;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.STTblWidth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.ProgramEntity;
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.entity.RuleVacationEntity;
+import ro.wolfnet.programmanager.entity.StationEntity;
 import ro.wolfnet.programmanager.model.EmployeeModel;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.ProgramModel;
@@ -74,6 +77,7 @@ public class ProgramService {
   @Autowired
   private RuleService ruleService;
 
+  /** The user service. */
   @Autowired
   private UserService userService;
 
@@ -118,6 +122,7 @@ public class ProgramService {
     }
 
     ProgramModel model = new ProgramModel();
+    model.setStationId(entity.getStation().getId());
     model.setStationName(entity.getStation().getName());
     model.appendEmployee(employeeService.getModelFromEntity(entity.getEmployee()));
     return model;
@@ -405,7 +410,7 @@ public class ProgramService {
    *
    * @param dayOfProgram the day of program
    * @param table the table
-   * @param exportColumns 
+   * @param exportColumns the export columns
    */
   private void addProgramsOfMonthToTable(Date dayOfProgram, XWPFTable table, int[] exportColumns) {
     XWPFTableRow row = table.createRow();
@@ -458,18 +463,18 @@ public class ProgramService {
       if (exportColumnsList.contains(Utils.EXPORT_COLUMN_WORKED)) {
         row = table.getRows().get(1);
         addTextToCell(row.addNewTableCell(), "W", false);
-        
+
         for (int i = 0; i < employees.size(); i++) {
           row = table.getRows().get(i + 2);
           long employeeId = employees.get(i).getId();
           addTextToCell(row.addNewTableCell(), employeeWorkedHours.get(employeeId) + "", false);
         }
       }
-      
+
       if (exportColumnsList.contains(Utils.EXPORT_COLUMN_VACATION)) {
         row = table.getRows().get(1);
         addTextToCell(row.addNewTableCell(), "V", false);
-        
+
         for (int i = 0; i < employees.size(); i++) {
           row = table.getRows().get(i + 2);
           long employeeId = employees.get(i).getId();
@@ -480,7 +485,7 @@ public class ProgramService {
       if (exportColumnsList.contains(Utils.EXPORT_COLUMN_TOTAL)) {
         row = table.getRows().get(1);
         addTextToCell(row.addNewTableCell(), "T", false);
-        
+
         for (int i = 0; i < employees.size(); i++) {
           row = table.getRows().get(i + 2);
           long employeeId = employees.get(i).getId();
@@ -585,6 +590,81 @@ public class ProgramService {
     }
 
     programRepository.deleteByDateOlderEqual(date);
+  }
+
+  /**
+   * Save manually program.
+   *
+   * @param model the model
+   * @return the string
+   */
+  @Transactional
+  public String saveManuallyProgram(ProgramModel model) {
+    if (model == null || model.getStationId() == 0) {
+      return "Error - Missing input fields!";
+    }
+
+    Integer stationCapacity = stationService.getCapacityForStationId(model.getStationId());
+    if (model.getEmployees() == null || stationCapacity == null || model.getEmployees().size() != stationCapacity) {
+      return "Error - Invalid employee fields!";
+    }
+
+    List<Long> employeeIds = new ArrayList<>();
+    for (EmployeeModel employee : model.getEmployees()) {
+      if (employee.getId() == 0) {
+        return "Error - Employee not set!";
+      }
+      else if (employeeIds.contains(employee.getId())) {
+        return "Error - Employee is duplicated!";
+      }
+      employeeIds.add(employee.getId());
+    }
+
+    List<ProgramEntity> entities = getEntitiesFromModel(model);
+    programRepository.deleteForStationAndDate(model.getStationId(), Utils.getDateFromBeginningOfDay(model.getDate()));
+    programRepository.save(entities);
+    return null;
+  }
+
+  /**
+   * Gets the entities from model.
+   *
+   * @param model the model
+   * @return the entities from model
+   */
+  private List<ProgramEntity> getEntitiesFromModel(ProgramModel model) {
+    if (model == null || model.getEmployees() == null) {
+      return null;
+    }
+
+    List<ProgramEntity> entities = new ArrayList<>();
+    for (EmployeeModel employeeModel : model.getEmployees()) {
+      StationEntity station = new StationEntity();
+      station.setId(model.getStationId());
+
+      EmployeeEntity employee = new EmployeeEntity();
+      employee.setId(employeeModel.getId());
+
+      ProgramEntity entity = new ProgramEntity();
+      entity.setDate(Utils.getDateFromBeginningOfDay(model.getDate()));
+      entity.setEmployee(employee);
+      entity.setId(0);
+      entity.setStation(station);
+      entity.setWorkedHours(24);
+      entities.add(entity);
+    }
+
+    return entities;
+  }
+
+  /**
+   * Delete for station and date.
+   *
+   * @param stationId the station id
+   * @param dayOfProgram the day of program
+   */
+  public void deleteForStationAndDate(long stationId, Date dayOfProgram) {
+    programRepository.deleteForStationAndDate(stationId, dayOfProgram);
   }
 
 }

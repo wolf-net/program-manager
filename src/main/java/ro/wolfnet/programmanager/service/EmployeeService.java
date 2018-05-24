@@ -42,9 +42,7 @@ public class EmployeeService {
    * @return the list
    */
   public List<EmployeeModel> findAll() {
-    List<EmployeeEntity> employeeEntities = this.employeeRepository.findAll();
-    List<EmployeeModel> employeeModels = getModelsFromEntityes(employeeEntities);
-    return employeeModels;
+    return filterEmployees(null, null);
   }
 
   /**
@@ -215,7 +213,6 @@ public class EmployeeService {
    *
    * @param employee the employee
    * @param programs the programs
-   * @param vacations 
    * @param generateForDay the month day
    * @return the worked hours of employee from programs
    */
@@ -237,6 +234,26 @@ public class EmployeeService {
       workedHours[0] += program.getWorkedHours();
     }
     return workedHours;
+  }
+
+  /**
+   * Filter employees.
+   *
+   * @param filterForStation the filter for station
+   * @param filterForDate the filter for date
+   * @return the list
+   */
+  public List<EmployeeModel> filterEmployees(Long filterForStation, Date filterForDate) {
+    List<EmployeeEntity> employeeEntities = null;
+    if (filterForStation != null && filterForDate != null) {
+      employeeEntities = this.employeeRepository.findByStationAndDate(filterForStation, filterForDate);
+    }
+    else {
+      employeeEntities = this.employeeRepository.findAll();
+    }
+
+    List<EmployeeModel> employeeModels = getModelsFromEntityes(employeeEntities);
+    return employeeModels;
   }
 
 }

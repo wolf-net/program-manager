@@ -1,6 +1,7 @@
 package ro.wolfnet.programmanager.model;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -11,8 +12,14 @@ import java.util.List;
  */
 public class ProgramModel {
 
+  /** The station id. */
+  private long stationId;
+
   /** The station name. */
   private String stationName;
+
+  /** The date. */
+  private Date date;
 
   /** The employees. */
   private List<EmployeeModel> employees;
@@ -78,6 +85,42 @@ public class ProgramModel {
       this.employees = new ArrayList<>();
     }
     this.employees.add(employee);
+  }
+
+  /**
+   * Gets the station id.
+   *
+   * @return the station id
+   */
+  public long getStationId() {
+    return stationId;
+  }
+
+  /**
+   * Sets the station id.
+   *
+   * @param stationId the new station id
+   */
+  public void setStationId(long stationId) {
+    this.stationId = stationId;
+  }
+
+  /**
+   * Gets the date.
+   *
+   * @return the date
+   */
+  public Date getDate() {
+    return date;
+  }
+
+  /**
+   * Sets the date.
+   *
+   * @param date the new date
+   */
+  public void setDate(Date date) {
+    this.date = date;
   }
 
   /* (non-Javadoc)
