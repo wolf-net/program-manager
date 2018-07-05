@@ -22,6 +22,21 @@ import javax.persistence.Table;
 @Table(name = "employee_entity")
 public class EmployeeEntity {
 
+  /**
+   * Instantiates a new employee entity.
+   */
+  public EmployeeEntity() {
+  }
+
+  /**
+   * Instantiates a new employee entity.
+   *
+   * @param id the id
+   */
+  public EmployeeEntity(Long id) {
+    this.id = id;
+  }
+
   /** The id. */
   private Long id;
 
@@ -216,6 +231,41 @@ public class EmployeeEntity {
    */
   public void setReplaces(Set<RuleVacationEntity> replaces) {
     this.replaces = replaces;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int PRIME = 31;
+    int result = 1;
+    result = PRIME * result;
+    if (id != null) {
+      result += id.longValue();
+    }
+    return result;
+  }
+
+  /* (non-Javadoc)
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    EmployeeEntity employee = (EmployeeEntity) obj;
+    if (employee != null && employee.getId() != null && !employee.getId().equals(id)) {
+      return false;
+    }
+    return true;
   }
 
 }

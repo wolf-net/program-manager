@@ -23,6 +23,7 @@ import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
 import ro.wolfnet.programmanager.service.generate.GenerateRule;
 import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
 import ro.wolfnet.programmanager.service.generate.VacationRule;
+import ro.wolfnet.programmanager.service.generate.WorkTogetherRule;
 import ro.wolfnet.programmanager.utils.Utils;
 
 /**
@@ -49,6 +50,10 @@ public class RuleService {
   /** The less worked rule. */
   @Autowired
   private LessWorkedRule lessWorkedRule;
+
+  /** The work together rule. */
+  @Autowired
+  private WorkTogetherRule workTogetherRule;
 
   /**
    * Save vacation rule.
@@ -214,7 +219,7 @@ public class RuleService {
       return null;
     }
 
-    List<GenerateRule> generateRules = Arrays.asList(assignedStationsRule, vacationRule, lessWorkedRule);
+    List<GenerateRule> generateRules = Arrays.asList(assignedStationsRule, vacationRule, lessWorkedRule, workTogetherRule);
     for (GenerateRule rule : generateRules) {
       allEmployees = rule.filterEmployees(stationId, date, allEmployees, rules);
     }
