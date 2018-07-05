@@ -10,134 +10,244 @@ import java.util.Date;
  */
 public class RuleModel {
 
-	/** The rule type vacation. */
-	public static int RULE_TYPE_VACATION = 1;
+  /** The rule type vacation. */
+  public static int RULE_TYPE_VACATION = 1;
+  
+  /** The rule type work together. */
+  public static int RULE_TYPE_WORK_TOGETHER = 2;
 
-	private long ruleId;
-	
-	/** The rule type. */
-	private int ruleType;
+  /** The operation. */
+  private String operation;
 
-	/** The start date. */
-	private Date startDate;
+  /** The rule id. */
+  private long ruleId;
 
-	/** The end date. */
-	private Date endDate;
+  /** The rule type. */
+  private int ruleType;
 
-	/** The employee. */
-	private long employee;
+  /** The start date. */
+  private Date startDate;
 
-	private String employeeName;
+  /** The end date. */
+  private Date endDate;
 
-    private long[] replacers;
+  /** The employee. */
+  private long employee;
 
-	private String[] replacersName;
+  /** The employee name. */
+  private String employeeName;
 
-	/**
-	 * Gets the start date.
-	 *
-	 * @return the start date
-	 */
-	public Date getStartDate() {
-		return startDate;
-	}
+  /** The replacers. */
+  private long[] replacers;
 
-	/**
-	 * Sets the start date.
-	 *
-	 * @param startDate
-	 *            the new start date
-	 */
-	public void setStartDate(Date startDate) {
-		this.startDate = startDate;
-	}
+  /** The replacers name. */
+  private String[] replacersName;
 
-	/**
-	 * Gets the end date.
-	 *
-	 * @return the end date
-	 */
-	public Date getEndDate() {
-		return endDate;
-	}
+  /** The employees. */
+  private long[] employees;
 
-	/**
-	 * Sets the end date.
-	 *
-	 * @param endDate
-	 *            the new end date
-	 */
-	public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}
+  /** The employees name. */
+  private String[] employeesName;
 
-	/**
-	 * Gets the employee.
-	 *
-	 * @return the employee
-	 */
-	public long getEmployee() {
-		return employee;
-	}
+  /**
+   * Gets the start date.
+   *
+   * @return the start date
+   */
+  public Date getStartDate() {
+    return startDate;
+  }
 
-	/**
-	 * Sets the employee.
-	 *
-	 * @param employee
-	 *            the new employee
-	 */
-	public void setEmployee(long employee) {
-		this.employee = employee;
-	}
+  /**
+   * Sets the start date.
+   *
+   * @param startDate
+   *            the new start date
+   */
+  public void setStartDate(Date startDate) {
+    this.startDate = startDate;
+  }
 
-	/**
-	 * Gets the rule type.
-	 *
-	 * @return the rule type
-	 */
-	public int getRuleType() {
-		return ruleType;
-	}
+  /**
+   * Gets the end date.
+   *
+   * @return the end date
+   */
+  public Date getEndDate() {
+    return endDate;
+  }
 
-	/**
-	 * Sets the rule type.
-	 *
-	 * @param ruleType
-	 *            the new rule type
-	 */
-	public void setRuleType(int ruleType) {
-		this.ruleType = ruleType;
-	}
+  /**
+   * Sets the end date.
+   *
+   * @param endDate
+   *            the new end date
+   */
+  public void setEndDate(Date endDate) {
+    this.endDate = endDate;
+  }
 
-	public String getEmployeeName() {
-		return employeeName;
-	}
+  /**
+   * Gets the employee.
+   *
+   * @return the employee
+   */
+  public long getEmployee() {
+    return employee;
+  }
 
-	public void setEmployeeName(String employeeName) {
-		this.employeeName = employeeName;
-	}
+  /**
+   * Sets the employee.
+   *
+   * @param employee
+   *            the new employee
+   */
+  public void setEmployee(long employee) {
+    this.employee = employee;
+  }
 
-	public long getRuleId() {
-		return ruleId;
-	}
+  /**
+   * Gets the rule type.
+   *
+   * @return the rule type
+   */
+  public int getRuleType() {
+    return ruleType;
+  }
 
-	public void setRuleId(long ruleId) {
-		this.ruleId = ruleId;
-	}
+  /**
+   * Sets the rule type.
+   *
+   * @param ruleType
+   *            the new rule type
+   */
+  public void setRuleType(int ruleType) {
+    this.ruleType = ruleType;
+  }
 
-	public long[] getReplacers() {
-		return replacers;
-	}
+  /**
+   * Gets the employee name.
+   *
+   * @return the employee name
+   */
+  public String getEmployeeName() {
+    return employeeName;
+  }
 
-	public void setReplacers(long[] replacers) {
-		this.replacers = replacers;
-	}
+  /**
+   * Sets the employee name.
+   *
+   * @param employeeName the new employee name
+   */
+  public void setEmployeeName(String employeeName) {
+    this.employeeName = employeeName;
+  }
 
-	public String[] getReplacersName() {
-		return replacersName;
-	}
+  /**
+   * Gets the rule id.
+   *
+   * @return the rule id
+   */
+  public long getRuleId() {
+    return ruleId;
+  }
 
-	public void setReplacersName(String[] replacersName) {
-		this.replacersName = replacersName;
-	}
+  /**
+   * Sets the rule id.
+   *
+   * @param ruleId the new rule id
+   */
+  public void setRuleId(long ruleId) {
+    this.ruleId = ruleId;
+  }
+
+  /**
+   * Gets the replacers.
+   *
+   * @return the replacers
+   */
+  public long[] getReplacers() {
+    return replacers;
+  }
+
+  /**
+   * Sets the replacers.
+   *
+   * @param replacers the new replacers
+   */
+  public void setReplacers(long[] replacers) {
+    this.replacers = replacers;
+  }
+
+  /**
+   * Gets the replacers name.
+   *
+   * @return the replacers name
+   */
+  public String[] getReplacersName() {
+    return replacersName;
+  }
+
+  /**
+   * Sets the replacers name.
+   *
+   * @param replacersName the new replacers name
+   */
+  public void setReplacersName(String[] replacersName) {
+    this.replacersName = replacersName;
+  }
+
+  /**
+   * Gets the employees.
+   *
+   * @return the employees
+   */
+  public long[] getEmployees() {
+    return employees;
+  }
+
+  /**
+   * Sets the employees.
+   *
+   * @param employees the new employees
+   */
+  public void setEmployees(long[] employees) {
+    this.employees = employees;
+  }
+
+  /**
+   * Gets the operation.
+   *
+   * @return the operation
+   */
+  public String getOperation() {
+    return operation;
+  }
+
+  /**
+   * Sets the operation.
+   *
+   * @param operation the new operation
+   */
+  public void setOperation(String operation) {
+    this.operation = operation;
+  }
+
+  /**
+   * Gets the employees name.
+   *
+   * @return the employees name
+   */
+  public String[] getEmployeesName() {
+    return employeesName;
+  }
+
+  /**
+   * Sets the employees name.
+   *
+   * @param employeesName the new employees name
+   */
+  public void setEmployeesName(String[] employeesName) {
+    this.employeesName = employeesName;
+  }
 }

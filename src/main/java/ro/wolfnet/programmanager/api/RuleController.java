@@ -36,7 +36,15 @@ public class RuleController {
   @RequestMapping(value = "/rule", method = RequestMethod.PUT)
   public ResponseEntity<Void> insertRule(@RequestBody RuleModel model) {
     try {
-      ruleService.saveVacationRule(model);
+      if ("saveVacation".equals(model.getOperation())) {
+        ruleService.saveVacationRule(model);
+      }
+      else if ("saveWorkTogether".equals(model.getOperation())) {
+        ruleService.saveWorkTogetherRule(model);
+      }
+      else {
+        throw new InvalidParameterException("Untreated operation: " + model.getOperation());
+      }
     } catch (InvalidParameterException e) {
       return new ResponseEntity<Void>(HttpStatus.EXPECTATION_FAILED);
     }
@@ -46,7 +54,6 @@ public class RuleController {
   /**
    * Gets the rules.
    *
-   * @param model the model
    * @return the rules
    */
   @RequestMapping(value = "/rule", method = RequestMethod.GET)
@@ -55,9 +62,15 @@ public class RuleController {
     return new ResponseEntity<List<RuleModel>>(rules, HttpStatus.OK);
   }
 
+  /**
+   * Delete employee.
+   *
+   * @param ruleId the rule id
+   * @return the response entity
+   */
   @RequestMapping(value = "/rule", method = RequestMethod.DELETE)
   public ResponseEntity<Void> deleteEmployee(long ruleId) {
-	ruleService.deleteById(ruleId);
+    ruleService.deleteById(ruleId);
     return new ResponseEntity<Void>(HttpStatus.OK);
   }
 

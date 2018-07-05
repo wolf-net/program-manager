@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import ro.wolfnet.programmanager.entity.EmployeeEntity;
 import ro.wolfnet.programmanager.entity.RuleBaseEntity;
 import ro.wolfnet.programmanager.entity.RuleVacationEntity;
+import ro.wolfnet.programmanager.entity.RuleWorkTogetherEntity;
 import ro.wolfnet.programmanager.model.EmployeeStatusModel;
 import ro.wolfnet.programmanager.model.RuleModel;
 import ro.wolfnet.programmanager.repository.RuleRepository;
@@ -69,15 +70,15 @@ public class RuleService {
     employeeEntity.setId(ruleModel.getEmployee());
     employees.add(employeeEntity);
     entity.setEmployees(employees);
-    
+
     if (ruleModel.getReplacers() != null) {
-    	entity.setReplacers(new HashSet<>());
-    	for (long replacer:ruleModel.getReplacers()) {
-    		EmployeeEntity replacerEntity = new EmployeeEntity();
-    		replacerEntity.setId(replacer);
-    		entity.getReplacers().add(replacerEntity);
-    		
-    	}
+      entity.setReplacers(new HashSet<>());
+      for (long replacer : ruleModel.getReplacers()) {
+        EmployeeEntity replacerEntity = new EmployeeEntity();
+        replacerEntity.setId(replacer);
+        entity.getReplacers().add(replacerEntity);
+
+      }
     }
 
     ruleRepository.save(entity);
@@ -109,7 +110,31 @@ public class RuleService {
     if (rule instanceof RuleVacationEntity) {
       return getRuleModelFromVacationEntity((RuleVacationEntity) rule);
     }
+    if (rule instanceof RuleWorkTogetherEntity) {
+      return getRuleModelFromWorkTogetherEntity((RuleWorkTogetherEntity) rule);
+    }
     return null;
+  }
+
+  /**
+   * Gets the rule model from work together entity.
+   *
+   * @param rule the rule
+   * @return the rule model from work together entity
+   */
+  private RuleModel getRuleModelFromWorkTogetherEntity(RuleWorkTogetherEntity rule) {
+    RuleModel model = new RuleModel();
+    model.setRuleId(rule.getId());
+    model.setRuleType(RuleModel.RULE_TYPE_WORK_TOGETHER);
+    if (rule.getEmployees() != null) {
+      String[] employeesName = new String[rule.getEmployees().size()];
+      Iterator<EmployeeEntity> employeesIterator = rule.getEmployees().iterator();
+      for (int i = 0; employeesIterator.hasNext(); i++) {
+        employeesName[i] = employeesIterator.next().getName();
+      }
+      model.setEmployeesName(employeesName);
+    }
+    return model;
   }
 
   /**
@@ -128,12 +153,12 @@ public class RuleService {
     model.setStartDate(rule.getStart());
     model.setRuleType(RuleModel.RULE_TYPE_VACATION);
     if (rule.getReplacers() != null) {
-    	String[] replacersName = new String[rule.getReplacers().size()];
-    	Iterator<EmployeeEntity> replacersIterator = rule.getReplacers().iterator();
-    	for (int i = 0; replacersIterator.hasNext(); i++) {
-    		replacersName[i] = replacersIterator.next().getName();
-    	}
-    	model.setReplacersName(replacersName);
+      String[] replacersName = new String[rule.getReplacers().size()];
+      Iterator<EmployeeEntity> replacersIterator = rule.getReplacers().iterator();
+      for (int i = 0; replacersIterator.hasNext(); i++) {
+        replacersName[i] = replacersIterator.next().getName();
+      }
+      model.setReplacersName(replacersName);
     }
     return model;
   }
@@ -144,9 +169,7 @@ public class RuleService {
    * @param ruleId the rule id
    */
   public void deleteById(long ruleId) {
-    RuleVacationEntity entity = new RuleVacationEntity();
-    entity.setId(ruleId);
-    ruleRepository.delete(entity);
+    ruleRepository.delete(ruleId);
   }
 
   /**
@@ -201,8 +224,8 @@ public class RuleService {
 
   /**
    * Filter active vacations.
- * @param date 
    *
+   * @param date the date
    * @param rules the rules
    * @return the list
    */
@@ -225,6 +248,27 @@ public class RuleService {
       activeVacations.add(vacation);
     }
     return activeVacations;
+  }
+
+  /**
+   * Save work together rule.
+   *
+   * @param model the model
+   */
+  public void saveWorkTogetherRule(RuleModel model) {
+    if (model == null || model.getEmployees() == null || model.getEmployees().length <= 1) {
+      throw new InvalidParameterException();
+    }
+
+    RuleWorkTogetherEntity entity = new RuleWorkTogetherEntity();
+    Set<EmployeeEntity> employees = new HashSet<>();
+    for (long employeeId : model.getEmployees()) {
+      EmployeeEntity employeeEntity = new EmployeeEntity();
+      employeeEntity.setId(employeeId);
+      employees.add(employeeEntity);
+    }
+    entity.setEmployees(employees);
+    ruleRepository.save(entity);
   }
 
 }

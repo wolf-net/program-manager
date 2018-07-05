@@ -595,26 +595,56 @@ function loadRules() {
 		$('#section-2').prepend('<div class="cards-list-container"></div>');
 		
 		$(response).each(function(index, element) {
-			$('#section-2 .cards-list-container').append(
-				'<div class="card vacation">' +  
-					'<div class="card-content">' + 
-						'<input type="hidden" id="ruleId" value="' + element.ruleId + '" />' +
-						'<div class="name-display">' + element.employeeName + '</div>' +
-						'<div class="interval-display">' + formatDate(new Date(element.startDate)) + ' - ' + formatDate(new Date(element.endDate)) + '</div>' +
-						'<div>Replacers: ' + element.replacersName + '</div>' +
-					'</div>' +
-					'<div class="card-buttons">' +
-						'<i class="fa fa-trash-o" onclick="deleteRule(this);"></i>' + 
-					'</div>' +
-				'</div>');
+			if (element.ruleType == 1) {
+				$('#section-2 .cards-list-container').append(
+					'<div class="card vacation">' +  
+						'<div class="card-content">' + 
+							'<input type="hidden" id="ruleId" value="' + element.ruleId + '" />' +
+							'<div class="name-display">' + element.employeeName + '</div>' +
+							'<div class="interval-display">' + formatDate(new Date(element.startDate)) + ' - ' + formatDate(new Date(element.endDate)) + '</div>' +
+							'<div>Replacers: ' + element.replacersName + '</div>' +
+						'</div>' +
+						'<div class="card-buttons">' +
+							'<i class="fa fa-trash-o" onclick="deleteRule(this);"></i>' + 
+						'</div>' +
+					'</div>'
+				);
+			} else if (element.ruleType == 2) {
+				$('#section-2 .cards-list-container').append(
+					'<div class="card workTogether">' +  
+						'<div class="card-content">' + 
+							'<input type="hidden" id="ruleId" value="' + element.ruleId + '" />' +
+							'<div class="names-display">' + getStringFromArray(element.employeesName) + '</div>' +
+						'</div>' +
+						'<div class="card-buttons">' +
+							'<i class="fa fa-trash-o" onclick="deleteRule(this);"></i>' + 
+						'</div>' +
+					'</div>'
+				);
+			}
 		});
 	});
 	ruleTypeChanged();
 	wizardNavigate(0);
 }
 
+function getStringFromArray(array) {
+	if (array == undefined || array == null) {
+		return null;
+	}
+	
+	var result = "";
+	jQuery(array).each(function(){
+		if (result != "") {
+			result += ", ";
+		}
+		result += this;
+	});
+	return result;
+}
+
 function deleteRule(button) {
-	var ruleId = $(button).parents(".card.vacation").find("#ruleId").val();
+	var ruleId = $(button).parents(".card").find("#ruleId").val();
 	$.ajax({
 		url: "rule?ruleId=" + ruleId,
 		method: "DELETE"
@@ -656,6 +686,7 @@ function ruleTypeChanged() {
 		$('.wizard').append(
 			'<section style="display: none;">' +
 			'<form id="ruleForm">' +
+			'<input name="operation" type="hidden" value="saveVacation" />' +
 			'<input name="ruleType" type="hidden" value="1" />' +
 		    '<h3>Vacation</h3>' +
 		    'Start date:' +
@@ -675,8 +706,12 @@ function ruleTypeChanged() {
 	else if (selected == 'together') {
 		$('.wizard').append(
 			'<section style="display: none;">' +
-		    '<h3>Work together</h3>' +
+			'<form id="ruleForm">' +
+			'<input name="operation" type="hidden" value="saveWorkTogether" />' +
+			'<select name="employees" multiple="multiple" /> ' +
+		    '</form>' +
 		    '</section>');
+		initializeEmployeeInput($('.wizard [name="employees"]'));
 	}
 }
 
