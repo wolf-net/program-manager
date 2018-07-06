@@ -753,7 +753,7 @@ p.info {
 	background-color: #e0e0d1;
 	display:table;
 	width: 95%;
-	margin: 0 auto;
+	margin: 50px auto;
 }
 
 .wizard-container .wizard-prev,
@@ -824,4 +824,32 @@ p.info {
     content: "\f0c0";
     display: table-cell;
     padding: 20px 0 0 20px;
+}
+
+.filter-list-container {
+    background-color: #f4f4f7;
+    position: fixed;
+    z-index: 99999;
+    width: 100%;
+    top: 140px;
+    left: 0;
+}
+
+.filter-list-container .padding {
+    margin: 0 auto;
+    padding: 1em 1.3em;
+    max-width: 1230px;
+}
+
+.filter-list-container input {
+	float: left;
+    border-color: #808080;
+    width: 85%;
+}
+
+.filter-list-container .results-counter {
+    float: right;
+    text-align: right;
+    margin: 0.4em 0;
+	width: 15%;
 }

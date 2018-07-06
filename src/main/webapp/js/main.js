@@ -85,7 +85,7 @@ function loadEmployees() {
 		$('#section-3 .cards-list-container .card').remove();
 		$(response).each(function(index, element) {
 			var cardContent = 
-				'<div class="card ' + element.type + '">' +
+				'<div class="card exist ' + element.type + '">' +
 				'  <div class="card-buttons">' +
 				'  	<i class="fa fa-edit" onClick="editEmployee(this)"></i>' +
 				'  </div>' +
@@ -120,10 +120,29 @@ function loadEmployees() {
 			'	</form>' +
 			' </div>' +
 			'</div>';
-		$('#section-3 .cards-list-container').append(cardContent);
+		$('#section-3 .cards-list-container').prepend(cardContent);
+		$('#section-3 .results-counter').html('#' + $('#section-3 .cards-list-container .card.exist').length);
 		
 		initializeStationInput($('#new-employee [name="station-input"]'));
 	});
+}
+
+function filterCards(input) {
+	var search = $(input).val().trim().toLowerCase().split(/\s+/);
+	var cards = $(input).parents('.filter-list-container').siblings('.cards-list-container').find('.card.exist');
+	
+	cards.show();
+	cards.each(function() {
+		var jCard = $(this);
+		jCard.hide();
+		$(search).each(function(index, value) {
+			if (jCard.text().toLowerCase().indexOf(value) > -1) {
+				jCard.show();
+			}
+		});
+		
+	});
+	$(input).siblings('.results-counter').html('#' + cards.filter(':visible').length);
 }
 
 function initializeStationInput(jInput, filterDateWithoutProgram) {
@@ -234,7 +253,7 @@ function loadStations() {
 		$('#section-4 .cards-list-container .card').remove();
 		$(response).each(function(index, element) {
 			var cardContent = 
-				'<div class="card ' + element.type + '">' +
+				'<div class="card exist ' + element.type + '">' +
 				'  <div class="card-buttons">' +
 				'  	<i class="fa fa-edit" onClick="editStation(this)"></i>' +
 				'  </div>' +
@@ -259,7 +278,8 @@ function loadStations() {
 			'	</form>' +
 			' </div>' +
 			'</div>';
-		$('#section-4 .cards-list-container').append(cardContent);
+		$('#section-4 .cards-list-container').prepend(cardContent);
+		$('#section-4 .results-counter').html('#' + $('#section-4 .cards-list-container .card.exist').length);
 	});
 }
 
@@ -592,12 +612,12 @@ function loadRules() {
 		url: "rule"
 	}).done(function(response) {
 		$('#section-2 .cards-list-container').remove();
-		$('#section-2').prepend('<div class="cards-list-container"></div>');
+		$('#section-2').append('<div class="cards-list-container"></div>');
 		
 		$(response).each(function(index, element) {
 			if (element.ruleType == 1) {
 				$('#section-2 .cards-list-container').append(
-					'<div class="card vacation">' +  
+					'<div class="card exist vacation">' +  
 						'<div class="card-content">' + 
 							'<input type="hidden" id="ruleId" value="' + element.ruleId + '" />' +
 							'<div class="name-display">' + element.employeeName + '</div>' +
@@ -611,7 +631,7 @@ function loadRules() {
 				);
 			} else if (element.ruleType == 2) {
 				$('#section-2 .cards-list-container').append(
-					'<div class="card workTogether">' +  
+					'<div class="card exist workTogether">' +  
 						'<div class="card-content">' + 
 							'<input type="hidden" id="ruleId" value="' + element.ruleId + '" />' +
 							'<div class="names-display">' + getStringFromArray(element.employeesName) + '</div>' +
@@ -623,6 +643,8 @@ function loadRules() {
 				);
 			}
 		});
+		
+		$('#section-2 .results-counter').html('#' + $('#section-2 .cards-list-container .card.exist').length);
 	});
 	ruleTypeChanged();
 	wizardNavigate(0);
