@@ -164,6 +164,7 @@ function initializeStationInput(jInput, filterDateWithoutProgram) {
 		
 		jInput.select2({
 			placeholder: "Station",
+			closeOnSelect: false,
 			data: results
 		});
 		
@@ -193,6 +194,7 @@ function initializeEmployeeInput(jInput, filterStationId, filterDate) {
 		
 		jInput.select2({
 			placeholder: "Employee",
+			closeOnSelect: false,
 			data: results
 		});
 		
