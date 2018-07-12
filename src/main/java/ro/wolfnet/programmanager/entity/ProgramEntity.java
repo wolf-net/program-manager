@@ -173,7 +173,7 @@ public class ProgramEntity {
       return false;
     }
     ProgramEntity entity = (ProgramEntity) obj;
-    if (employee != null && entity.getEmployee() != null && employee.getId() != entity.getEmployee().getId()) {
+    if (employee != null && employee.getId() != null && entity.getEmployee() != null && !employee.getId().equals(entity.getEmployee().getId())) {
       return false;
     }
     return true;
