@@ -74,7 +74,10 @@ public class VacationRule implements GenerateRule {
 
     for (RuleVacationEntity vacation : myVacations) {
       if (vacation.getStart().after(date) || vacation.getEnd().before(date)) {
-        employee.setWorkedHours(employee.getWorkedHours() + getAuxWorkedHours(date, employee, vacation, myVacations, vacationRules));
+        if (employee.isVacationHoursEqualized()) {
+          employee.setWorkedHours(employee.getWorkedHours() + getAuxWorkedHours(date, employee, vacation, myVacations, vacationRules));
+          employee.setVacationHoursEqualized(true);
+        }
         continue;
       }
       //employee is on vacation

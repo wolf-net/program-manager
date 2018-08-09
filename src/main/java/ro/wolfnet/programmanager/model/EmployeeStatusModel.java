@@ -22,6 +22,9 @@ public class EmployeeStatusModel extends EmployeeModel {
   /** The worked hours equalized. */
   private boolean workedHoursEqualized;
 
+  /** The vacation hours equalized. */
+  private boolean vacationHoursEqualized;
+
   /**
    * Instantiates a new employee status model.
    */
@@ -125,6 +128,24 @@ public class EmployeeStatusModel extends EmployeeModel {
    */
   public void setWorkedHoursEqualized(boolean workedHoursEqualized) {
     this.workedHoursEqualized = workedHoursEqualized;
+  }
+
+  /**
+   * Checks if is vacation hours equalized.
+   *
+   * @return true, if is vacation hours equalized
+   */
+  public boolean isVacationHoursEqualized() {
+    return vacationHoursEqualized;
+  }
+
+  /**
+   * Sets the vacation hours equalized.
+   *
+   * @param vacationHoursEqualized the new vacation hours equalized
+   */
+  public void setVacationHoursEqualized(boolean vacationHoursEqualized) {
+    this.vacationHoursEqualized = vacationHoursEqualized;
   }
 
 }
