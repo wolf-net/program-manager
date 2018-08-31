@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -194,6 +195,9 @@ public class ProgramService {
     return null;
   }
 
+  /** The sdf. */
+  private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
   /**
    * Gets the programs for station.
    *
@@ -212,6 +216,8 @@ public class ProgramService {
 
     List<ProgramEntity> newPrograms = new ArrayList<>();
     for (int cnt = 0; cnt < station.getCapacity(); cnt++) {
+      log(date, station);
+
       EmployeeStatusModel chosenEmployee = getRandomEmployeeModelFromList(station.getId(), date, allEmployees, rules);
       allEmployees.remove(chosenEmployee);
 
@@ -223,6 +229,18 @@ public class ProgramService {
       newPrograms.add(program);
     }
     return newPrograms;
+  }
+
+  /**
+   * Log.
+   *
+   * @param date the date
+   * @param station the station
+   */
+  private void log(Date date, StationModel station) {
+    System.out.println("\n\n");
+    System.out.println("Date: " + sdf.format(date) + ", station: " + station.getName());
+    System.out.println("-----------------------------------------------------");
   }
 
   /**

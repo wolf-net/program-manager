@@ -22,6 +22,7 @@ import ro.wolfnet.programmanager.repository.RuleRepository;
 import ro.wolfnet.programmanager.service.generate.AssignedStationsRule;
 import ro.wolfnet.programmanager.service.generate.GenerateRule;
 import ro.wolfnet.programmanager.service.generate.LessWorkedRule;
+import ro.wolfnet.programmanager.service.generate.MinimumFreeDaysRule;
 import ro.wolfnet.programmanager.service.generate.VacationRule;
 import ro.wolfnet.programmanager.service.generate.WorkTogetherRule;
 import ro.wolfnet.programmanager.utils.Utils;
@@ -54,6 +55,10 @@ public class RuleService {
   /** The work together rule. */
   @Autowired
   private WorkTogetherRule workTogetherRule;
+
+  /** The minimum free days rule. */
+  @Autowired
+  private MinimumFreeDaysRule minimumFreeDaysRule;
 
   /**
    * Save vacation rule.
@@ -219,12 +224,27 @@ public class RuleService {
       return null;
     }
 
-    List<GenerateRule> generateRules = Arrays.asList(assignedStationsRule, vacationRule, lessWorkedRule, workTogetherRule);
+    List<GenerateRule> generateRules = Arrays.asList(assignedStationsRule, vacationRule, minimumFreeDaysRule, lessWorkedRule, workTogetherRule);
     for (GenerateRule rule : generateRules) {
       allEmployees = rule.filterEmployees(stationId, date, allEmployees, rules);
+      log(rule, allEmployees);
     }
 
     return allEmployees;
+  }
+
+  /**
+   * Log.
+   *
+   * @param rule the rule
+   * @param allEmployees the all employees
+   */
+  private void log(GenerateRule rule, List<EmployeeStatusModel> allEmployees) {
+    System.out.print("Rule: " + rule.getClass().getSimpleName() + ": ");
+    for (EmployeeStatusModel employee : allEmployees) {
+      System.out.print(employee.getName() + "[" + employee.getWorkedHours() + "]" + ", ");
+    }
+    System.out.println();
   }
 
   /**
