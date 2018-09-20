@@ -210,7 +210,7 @@ public class ProgramService {
    */
   private List<ProgramEntity> getProgramsForStation(StationModel station, Date date, List<EmployeeStatusModel> allEmployees,
                                                     List<RuleBaseEntity> rules) throws IncompatibleRulesException {
-    if (station == null || station.getCapacity() == 0) {
+    if (station == null) {
       throw new IncompatibleRulesException();
     }
 

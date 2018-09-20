@@ -121,6 +121,9 @@ public class VacationRule implements GenerateRule {
 
     List<RuleVacationEntity> myVacations = new ArrayList<>();
     for (RuleVacationEntity vacation : vacationRules) {
+      if (vacation == null || vacation.getEmployees() == null || vacation.getEmployees().isEmpty()) {
+        continue;
+      }
       if (vacation.getEmployees().iterator().next().getId() == employeeId) {
         myVacations.add(vacation);
       }

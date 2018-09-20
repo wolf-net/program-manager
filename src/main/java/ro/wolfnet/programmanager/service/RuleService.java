@@ -154,11 +154,16 @@ public class RuleService {
    * @return the rule model from vacation entity
    */
   private RuleModel getRuleModelFromVacationEntity(RuleVacationEntity rule) {
+    if (rule == null) {
+      return null;
+    }
     RuleModel model = new RuleModel();
-    EmployeeEntity employee = rule.getEmployees().iterator().next();
     model.setRuleId(rule.getId());
-    model.setEmployee(employee.getId());
-    model.setEmployeeName(employee.getName());
+    if (rule.getEmployees() != null && !rule.getEmployees().isEmpty()) {
+      EmployeeEntity employee = rule.getEmployees().iterator().next();
+      model.setEmployee(employee.getId());
+      model.setEmployeeName(employee.getName());
+    }
     model.setEndDate(rule.getEnd());
     model.setStartDate(rule.getStart());
     model.setRuleType(RuleModel.RULE_TYPE_VACATION);
